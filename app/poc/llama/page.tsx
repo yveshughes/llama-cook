@@ -298,9 +298,6 @@ export default function LlamaPOC() {
           </div>
         </div>
       </section>
-
-          </div>
-        </section>
       )}
 
       {/* Features Grid */}

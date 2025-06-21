@@ -313,9 +313,6 @@ export default function VJEPAPOC() {
           </div>
         </div>
       </section>
-
-          </div>
-        </section>
       )}
 
       {/* Use Cases */}

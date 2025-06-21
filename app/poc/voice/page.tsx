@@ -351,9 +351,6 @@ export default function VoicePOC() {
           </div>
         </div>
       </section>
-
-          </div>
-        </section>
       )}
 
       {/* Integration Diagram */}
