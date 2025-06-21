@@ -91,7 +91,7 @@ export default function LlamaFeature() {
               viewport={{ once: true }}
             >
               <p className="text-sm text-gray-600">
-                <span className="font-semibold text-herb-red">Advanced AI:</span> Powered by Meta's latest language model for comprehensive culinary knowledge
+                <span className="font-semibold text-herb-red">Advanced AI:</span> Powered by Meta&apos;s latest language model for comprehensive culinary knowledge
               </p>
             </motion.div>
           </motion.div>

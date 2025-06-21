@@ -11,6 +11,7 @@ export default function HeroSection() {
           src="/screens/background-sample.png"
           alt=""
           className="h-full w-full object-cover opacity-10"
+          loading="lazy"
         />
       </div>
       <div className="mx-auto max-w-7xl px-6 lg:px-8">

@@ -77,7 +77,7 @@ export default function VoiceFeature() {
                 </div>
                 <div className="ml-4">
                   <h3 className="text-lg font-semibold text-gray-900">Voice Activation</h3>
-                  <p className="mt-1 text-gray-600">Simply say "Sous Chef" to get started</p>
+                  <p className="mt-1 text-gray-600">Simply say &quot;Sous Chef&quot; to get started</p>
                 </div>
               </motion.div>
               

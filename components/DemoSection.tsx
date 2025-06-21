@@ -52,7 +52,7 @@ export default function DemoSection() {
               transition={{ delay: 0.4 }}
             >
               <h3 className="text-xl font-semibold text-olive mb-4">
-                What You'll Need
+                What You&apos;ll Need
               </h3>
               <div className="text-left max-w-md mx-auto space-y-3 text-gray-600">
                 {[
@@ -108,6 +108,7 @@ export default function DemoSection() {
                       width={300}
                       height={300}
                       className="block"
+                      loading="lazy"
                     />
                   </motion.div>
                   
