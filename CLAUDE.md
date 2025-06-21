@@ -47,3 +47,21 @@ npm run lint       # Run ESLint
 - No testing framework is currently configured
 - TypeScript strict mode is enabled - ensure proper typing
 - Tailwind CSS v4 uses a new configuration approach (no separate config file)
+
+## Project Components
+
+### Landing Page
+- `/app/page.tsx` - Main landing page with technology showcase
+- `/components/HeroSection.tsx` - Hero section with video demo and feature list
+- `/components/SAM2Feature.tsx` - SAM2 technology showcase with video
+- `/components/LlamaFeature.tsx` - Llama AI feature explanation with video
+- `/components/VoiceFeature.tsx` - Voice interaction showcase with video
+- `/components/DemoSection.tsx` - QR code generator for demo access
+- `/components/SetupInstructions.tsx` - Step-by-step setup guide
+
+### Hackathon Context
+This is a Meta AI hackathon project demonstrating:
+- SAM2 for real-time ingredient detection and tracking
+- Llama for recipe generation and conversational guidance
+- Voice AI for hands-free interaction
+- iPhone camera streaming to MacBook for demo
