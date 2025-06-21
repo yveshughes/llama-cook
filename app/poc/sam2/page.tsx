@@ -211,7 +211,7 @@ export default function SAM2POC() {
               <div className="p-6 bg-olive/10 rounded-lg">
                 <h3 className="font-semibold text-gray-900 mb-2">Integration with Llama</h3>
                 <p className="text-sm text-gray-600">
-                  SAM2's detections are sent to Llama-4-Scout in real-time, enabling contextual recipe suggestions based on available ingredients and their states.
+                  SAM2's detections are structured by BoundaryML before being sent to Llama-4-Scout, ensuring consistent ingredient data format.
                 </p>
                 <Link 
                   href="/poc/llama"

@@ -266,10 +266,19 @@ export default function LlamaPOC() {
     }
   ],
   "temperature": 0.7,
-  "max_tokens": 500
+  "max_tokens": 500,
+  "output_format": "boundaryml_recipe_v1"  // Ensures structured recipe steps
 }`}
                   </pre>
                 </div>
+              </div>
+
+              {/* BoundaryML Integration */}
+              <div className="p-4 bg-purple-50 rounded-lg border border-purple-200">
+                <h3 className="font-semibold text-gray-900 mb-2">BoundaryML Integration</h3>
+                <p className="text-sm text-gray-600">
+                  Structures Llama's responses into consistent JSON with timed steps, ingredient quantities, and cooking actions.
+                </p>
               </div>
 
               {/* Integration with SAM2 */}

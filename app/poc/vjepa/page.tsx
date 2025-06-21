@@ -272,7 +272,8 @@ export default function VJEPAPOC() {
   "suggestions": [
     "Match mozzarella slice thickness to tomatoes",
     "Prepare serving platter now"
-  ]
+  ],
+  "boundaryml_confidence": 0.98  // Structured output validation
 }`}
                   </pre>
                 </div>

@@ -292,7 +292,7 @@ export default function VoicePOC() {
                   <div className="p-4 bg-purple-50 rounded-lg border border-purple-200">
                     <h3 className="font-semibold text-gray-900 mb-2">3. Voice Response</h3>
                     <p className="text-sm text-gray-600 mb-2">
-                      AWS Polly converts Llama's response to natural speech with neural voice engine.
+                      BoundaryML formats responses for optimal TTS, then AWS Polly converts to natural speech.
                     </p>
                     <code className="text-xs bg-gray-100 px-2 py-1 rounded">
                       polly.synthesizeSpeech({Engine: 'neural'})
@@ -311,8 +311,9 @@ export default function VoicePOC() {
     "wake_word_detection": "150ms",
     "transcription": "80ms",
     "llama_processing": "87ms",
+    "boundaryml_structuring": "12ms",
     "tts_generation": "120ms",
-    "total_end_to_end": "437ms"
+    "total_end_to_end": "449ms"
   },
   "accuracy": {
     "wake_word": "99.2%",

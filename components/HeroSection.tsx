@@ -75,14 +75,6 @@ export default function HeroSection() {
                 </div>
               </motion.div>
             </div>
-            
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.6 }}
-            >
-          
-            </motion.div>
           </motion.div>
           
           {/* Right side - Video */}
