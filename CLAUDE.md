@@ -60,8 +60,8 @@ npm run lint       # Run ESLint
 - `/components/SetupInstructions.tsx` - Step-by-step setup guide
 
 ### Hackathon Context
-This is a Meta AI hackathon project demonstrating:
+This is a Meta AI hackathon project called Llama-Cook demonstrating:
 - SAM2 for real-time ingredient detection and tracking
 - Llama for recipe generation and conversational guidance
-- Voice AI for hands-free interaction
+- Voice AI for hands-free interaction (activated by saying "Sous Chef")
 - iPhone camera streaming to MacBook for demo

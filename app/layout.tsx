@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Sous Chef - AI Cooking Assistant",
+  title: "Llama-Cook - AI Cooking Assistant",
   description: "Your AI-powered cooking assistant using Meta's SAM2, Llama, and Voice AI. Meta AI Hackathon 2024.",
 };
 

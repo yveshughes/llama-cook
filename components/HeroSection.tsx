@@ -4,7 +4,7 @@ import { motion } from 'framer-motion';
 
 export default function HeroSection() {
   return (
-    <section className="relative overflow-hidden py-24 sm:py-32">
+    <section className="relative overflow-hidden pt-32 pb-24 sm:pt-40 sm:pb-32">
       {/* Background image */}
       <div className="absolute inset-0 -z-10">
         <img
@@ -23,7 +23,7 @@ export default function HeroSection() {
             transition={{ duration: 0.8 }}
           >
             <h1 className="text-4xl font-bold tracking-tight text-gray-900 sm:text-6xl mb-6">
-              Sous Chef
+              Llama-Cook
             </h1>
             <p className="text-xl text-gray-600 mb-8">
               Your AI-powered cooking companion that guides you through every step with fresh, wholesome ingredients.

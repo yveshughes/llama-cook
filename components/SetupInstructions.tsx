@@ -19,7 +19,7 @@ const setupSteps = [
     title: 'Terminal 1: Backend Server',
     content: `# Clone and setup backend
 git clone [repo-url]
-cd sous-chef/backend
+cd llama-cook/backend
 
 # Install Python dependencies
 pip install -r requirements.txt
@@ -37,7 +37,7 @@ python server.py
     id: 'terminal2',
     title: 'Terminal 2: Frontend',
     content: `# In a new terminal
-cd sous-chef
+cd llama-cook
 
 # Install dependencies
 npm install
@@ -50,7 +50,7 @@ npm run dev
     id: 'terminal3',
     title: 'Terminal 3: SAM2 Service',
     content: `# In another terminal
-cd sous-chef/services/sam2
+cd llama-cook/services/sam2
 
 # Activate Python virtual environment
 python -m venv venv
