@@ -26,7 +26,7 @@ export default function HeroSection() {
               Llama-Cook
             </h1>
             <p className="text-xl text-gray-600 mb-8">
-              Your lightning-fast AI cooking companion powered by Llama-4-Scout, SAM2, and V-JEPA 2, delivering instant guidance and predictive assistance through every step.
+              Your lightning-fast AI cooking companion, delivering instant guidance and predictive assistance through every step.
             </p>
             
             <div className="space-y-4 mb-8">
@@ -81,9 +81,7 @@ export default function HeroSection() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.6 }}
             >
-              <span className="inline-flex items-center rounded-full bg-basil/10 px-4 py-2 text-sm font-medium text-basil">
-                Meta AI Hackathon 2024
-              </span>
+          
             </motion.div>
           </motion.div>
           

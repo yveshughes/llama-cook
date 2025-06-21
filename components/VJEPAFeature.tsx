@@ -1,6 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
+import Link from 'next/link';
 
 export default function VJEPAFeature() {
   return (
@@ -111,6 +112,24 @@ export default function VJEPAFeature() {
                 <div className="text-2xl font-bold text-olive">Adaptive</div>
                 <p className="text-xs text-gray-600 mt-1">Learns from context</p>
               </div>
+            </motion.div>
+            
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.8 }}
+              viewport={{ once: true }}
+              className="mt-6"
+            >
+              <Link
+                href="/poc/vjepa"
+                className="inline-flex items-center px-6 py-3 bg-herb-green text-white rounded-lg hover:bg-herb-green/90 transition-colors font-medium"
+              >
+                See POC in Action
+                <svg className="w-5 h-5 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
+              </Link>
             </motion.div>
           </motion.div>
           
