@@ -285,7 +285,7 @@ export default function VoicePOC() {
                       Once activated, captures the full command and sends to Llama-4-Scout with visual context.
                     </p>
                     <code className="text-xs bg-gray-100 px-2 py-1 rounded">
-                      await llamaAPI.chat({text: command, context: ingredients})
+                      {`await llamaAPI.chat({text: command, context: ingredients})`}
                     </code>
                   </div>
                   
@@ -295,7 +295,7 @@ export default function VoicePOC() {
                       BoundaryML formats responses for optimal TTS, then AWS Polly converts to natural speech.
                     </p>
                     <code className="text-xs bg-gray-100 px-2 py-1 rounded">
-                      polly.synthesizeSpeech({Engine: 'neural'})
+                      {`polly.synthesizeSpeech({Engine: 'neural'})`}
                     </code>
                   </div>
                 </div>
