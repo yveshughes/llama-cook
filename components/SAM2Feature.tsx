@@ -22,8 +22,8 @@ export default function SAM2Feature() {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                   </svg>
-                  <p className="text-lg font-medium">SAM2 Identifying Ingredients</p>
-                  <p className="text-sm text-gray-600 mt-2">Real-time ingredient detection</p>
+                  <p className="text-lg font-medium">SAM2 Video Segmentation</p>
+                  <p className="text-sm text-gray-600 mt-2">Interactive object tracking</p>
                 </div>
               </div>
             </div>
@@ -55,12 +55,12 @@ export default function SAM2Feature() {
                 Segment Anything Model 2
               </span>
               <h2 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
-                See Your Ingredients Clearly
+                Zero-Shot Video Segmentation in Real-Time
               </h2>
             </div>
             
             <p className="text-lg text-gray-600 mb-8">
-              SAM2 brings precision to your cooking by identifying every ingredient with advanced computer vision technology.
+              SAM2's streaming architecture processes video frames individually with per-session memory, enabling real-time interactive object tracking with a single click.
             </p>
             
             <div className="space-y-4">
@@ -77,8 +77,8 @@ export default function SAM2Feature() {
                   </svg>
                 </div>
                 <div className="ml-4">
-                  <h3 className="text-lg font-semibold text-gray-900">Smart Recognition</h3>
-                  <p className="mt-1 text-gray-600">Instantly identifies fresh produce and pantry staples</p>
+                  <h3 className="text-lg font-semibold text-gray-900">Zero-Shot Performance</h3>
+                  <p className="mt-1 text-gray-600">Segments unfamiliar objects without prior training</p>
                 </div>
               </motion.div>
               
@@ -95,8 +95,8 @@ export default function SAM2Feature() {
                   </svg>
                 </div>
                 <div className="ml-4">
-                  <h3 className="text-lg font-semibold text-gray-900">Portion Tracking</h3>
-                  <p className="mt-1 text-gray-600">Monitor your cuts and portions for consistent results</p>
+                  <h3 className="text-lg font-semibold text-gray-900">Persistent Object Tracking</h3>
+                  <p className="mt-1 text-gray-600">Tracks objects even when temporarily out of view</p>
                 </div>
               </motion.div>
               
@@ -113,8 +113,8 @@ export default function SAM2Feature() {
                   </svg>
                 </div>
                 <div className="ml-4">
-                  <h3 className="text-lg font-semibold text-gray-900">Real-time Processing</h3>
-                  <p className="mt-1 text-gray-600">Instant feedback as you prepare your ingredients</p>
+                  <h3 className="text-lg font-semibold text-gray-900">Streaming Inference</h3>
+                  <p className="mt-1 text-gray-600">Per-frame processing for minimal latency</p>
                 </div>
               </motion.div>
             </div>
@@ -127,8 +127,25 @@ export default function SAM2Feature() {
               viewport={{ once: true }}
             >
               <p className="text-sm text-gray-600">
-                <span className="font-semibold text-olive">Technical Note:</span> Processing 30+ frames per second for seamless cooking guidance
+                <span className="font-semibold text-olive">Performance:</span> Trained on SA-V dataset • 600K+ masklets • 51K videos • Outperforms existing VOS models
               </p>
+            </motion.div>
+            
+            <motion.div 
+              className="mt-4 grid grid-cols-2 gap-4"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.7 }}
+              viewport={{ once: true }}
+            >
+              <div className="bg-basil/5 rounded-lg p-3 border border-basil/20">
+                <div className="text-2xl font-bold text-basil">1-Click</div>
+                <p className="text-xs text-gray-600 mt-1">Object selection</p>
+              </div>
+              <div className="bg-tomato/5 rounded-lg p-3 border border-tomato/20">
+                <div className="text-2xl font-bold text-tomato">Real-time</div>
+                <p className="text-xs text-gray-600 mt-1">Video processing</p>
+              </div>
             </motion.div>
           </motion.div>
         </div>

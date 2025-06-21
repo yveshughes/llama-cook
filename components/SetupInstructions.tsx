@@ -25,6 +25,7 @@ cd llama-cook/backend
 pip install -r requirements.txt
 
 # Set environment variables
+export LLAMA_MODEL="llama-4-scout-17b-16e-instruct"
 export LLAMA_API_KEY="your-key"
 export AWS_ACCESS_KEY="your-key"
 export AWS_SECRET_KEY="your-secret"

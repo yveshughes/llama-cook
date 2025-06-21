@@ -51,7 +51,7 @@ export default function VoiceFeature() {
           >
             <div className="mb-6">
               <span className="inline-flex items-center rounded-full bg-tomato/10 px-3 py-1 text-sm font-medium text-tomato mb-4">
-                Voice AI Integration
+                Powered by AWS AI Services
               </span>
               <h2 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
                 Hands-Free Kitchen Assistant
@@ -59,7 +59,7 @@ export default function VoiceFeature() {
             </div>
             
             <p className="text-lg text-gray-600 mb-8">
-              Keep your hands free for cooking while getting real-time guidance through natural voice interaction.
+              Keep your hands free for cooking with AWS-powered voice recognition and synthesis, while SAM2 tracks ingredients and Llama-4-Scout delivers instant guidance.
             </p>
             
             <div className="space-y-4">
@@ -108,26 +108,69 @@ export default function VoiceFeature() {
               >
                 <div className="flex-shrink-0 h-10 w-10 rounded-lg bg-herb-red/10 flex items-center justify-center">
                   <svg className="w-6 h-6 text-herb-red" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
                   </svg>
                 </div>
                 <div className="ml-4">
-                  <h3 className="text-lg font-semibold text-gray-900">Perfect Timing</h3>
-                  <p className="mt-1 text-gray-600">Timers and reminders to keep your cooking on track</p>
+                  <h3 className="text-lg font-semibold text-gray-900">Lightning Fast</h3>
+                  <p className="mt-1 text-gray-600">Sub-100ms response time for seamless conversation</p>
                 </div>
               </motion.div>
             </div>
             
             <motion.div 
-              className="mt-8 p-4 bg-mozzarella rounded-lg border border-cream"
+              className="mt-8 space-y-4"
               initial={{ opacity: 0 }}
               whileInView={{ opacity: 1 }}
               transition={{ delay: 0.6 }}
               viewport={{ once: true }}
             >
-              <p className="text-sm text-gray-600">
-                <span className="font-semibold text-herb-green">Voice Technology:</span> Powered by AWS Polly and Transcribe for natural interactions
-              </p>
+              <div className="p-4 bg-mozzarella rounded-lg border border-cream">
+                <h4 className="font-semibold text-gray-900 mb-3">AWS Services Integration:</h4>
+                <div className="space-y-3">
+                  <div className="flex items-start">
+                    <div className="flex-shrink-0 w-8 h-8 bg-orange-100 rounded-lg flex items-center justify-center mt-0.5">
+                      <svg className="w-5 h-5 text-orange-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
+                      </svg>
+                    </div>
+                    <div className="ml-3">
+                      <h5 className="text-sm font-semibold text-gray-900">Amazon Transcribe Streaming</h5>
+                      <p className="text-xs text-gray-600 mt-0.5">Real-time speech-to-text with wake word detection for "Sous Chef"</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start">
+                    <div className="flex-shrink-0 w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center mt-0.5">
+                      <svg className="w-5 h-5 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3" />
+                      </svg>
+                    </div>
+                    <div className="ml-3">
+                      <h5 className="text-sm font-semibold text-gray-900">Amazon Polly Neural TTS</h5>
+                      <p className="text-xs text-gray-600 mt-0.5">Natural-sounding voice responses with emotion and emphasis</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start">
+                    <div className="flex-shrink-0 w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center mt-0.5">
+                      <svg className="w-5 h-5 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                      </svg>
+                    </div>
+                    <div className="ml-3">
+                      <h5 className="text-sm font-semibold text-gray-900">WebSocket Streaming</h5>
+                      <p className="text-xs text-gray-600 mt-0.5">Low-latency bidirectional audio for sub-100ms response</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div className="p-4 bg-olive/10 rounded-lg">
+                <p className="text-sm text-gray-700">
+                  <span className="font-semibold">Example:</span> "Sous Chef, I have tomatoes and mozzarella, what can we make?"
+                </p>
+                <p className="text-sm text-gray-600 mt-1 italic">
+                  "We could make a delicious Caprese Salad. Would you like me to guide you through it?"
+                </p>
+              </div>
             </motion.div>
           </motion.div>
         </div>

@@ -6,6 +6,7 @@ import { motion } from 'framer-motion';
 const navItems = [
   { id: 'hero', label: 'Home' },
   { id: 'sam2', label: 'Vision AI' },
+  { id: 'vjepa', label: 'Prediction AI' },
   { id: 'llama', label: 'Recipe AI' },
   { id: 'voice', label: 'Voice' },
   { id: 'demo', label: 'Demo' },

@@ -26,7 +26,7 @@ export default function HeroSection() {
               Llama-Cook
             </h1>
             <p className="text-xl text-gray-600 mb-8">
-              Your AI-powered cooking companion that guides you through every step with fresh, wholesome ingredients.
+              Your lightning-fast AI cooking companion powered by Llama-4-Scout, SAM2, and V-JEPA 2, delivering instant guidance and predictive assistance through every step.
             </p>
             
             <div className="space-y-4 mb-8">
@@ -37,11 +37,11 @@ export default function HeroSection() {
                 transition={{ delay: 0.2 }}
               >
                 <svg className="w-6 h-6 text-tomato mt-1 mr-3 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
                 </svg>
                 <div>
-                  <h3 className="font-semibold text-gray-900">Real-time Visual Guidance</h3>
-                  <p className="text-gray-600">Watch as AI helps you create perfectly prepared dishes</p>
+                  <h3 className="font-semibold text-gray-900">Lightning-Fast Response</h3>
+                  <p className="text-gray-600">Llama-4-Scout delivers instant answers with 1M token context</p>
                 </div>
               </motion.div>
               
@@ -55,8 +55,8 @@ export default function HeroSection() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
                 <div>
-                  <h3 className="font-semibold text-gray-900">Fresh Ingredient Focus</h3>
-                  <p className="text-gray-600">Create healthy meals with seasonal produce</p>
+                  <h3 className="font-semibold text-gray-900">Real-time Visual Recognition</h3>
+                  <p className="text-gray-600">SAM2 + Llama-4-Scout identify ingredients instantly</p>
                 </div>
               </motion.div>
               
@@ -67,11 +67,11 @@ export default function HeroSection() {
                 transition={{ delay: 0.4 }}
               >
                 <svg className="w-6 h-6 text-golden mt-1 mr-3 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
                 </svg>
                 <div>
-                  <h3 className="font-semibold text-gray-900">Hands-free Cooking</h3>
-                  <p className="text-gray-600">Voice control keeps your hands free for what matters</p>
+                  <h3 className="font-semibold text-gray-900">Low-Latency Voice Control</h3>
+                  <p className="text-gray-600">Scout's efficiency enables seamless hands-free cooking</p>
                 </div>
               </motion.div>
             </div>
