@@ -25,7 +25,7 @@ export default function VJEPAFeature() {
             </div>
             
             <p className="text-lg text-gray-600 mb-8">
-              V-JEPA 2's world model predicts cooking actions and outcomes, providing proactive guidance before you even ask.
+              V-JEPA 2&apos;s world model predicts cooking actions and outcomes, providing proactive guidance before you even ask.
             </p>
             
             <div className="space-y-4">

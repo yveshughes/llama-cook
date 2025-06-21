@@ -137,7 +137,7 @@ export default function VoiceFeature() {
                     </div>
                     <div className="ml-3">
                       <h5 className="text-sm font-semibold text-gray-900">Amazon Transcribe Streaming</h5>
-                      <p className="text-xs text-gray-600 mt-0.5">Real-time speech-to-text with wake word detection for "Sous Chef"</p>
+                      <p className="text-xs text-gray-600 mt-0.5">Real-time speech-to-text with wake word detection for &quot;Sous Chef&quot;</p>
                     </div>
                   </div>
                   <div className="flex items-start">
@@ -166,10 +166,10 @@ export default function VoiceFeature() {
               </div>
               <div className="p-4 bg-olive/10 rounded-lg">
                 <p className="text-sm text-gray-700">
-                  <span className="font-semibold">Example:</span> "Sous Chef, I have tomatoes and mozzarella, what can we make?"
+                  <span className="font-semibold">Example:</span> &quot;Sous Chef, I have tomatoes and mozzarella, what can we make?&quot;
                 </p>
                 <p className="text-sm text-gray-600 mt-1 italic">
-                  "We could make a delicious Caprese Salad. Would you like me to guide you through it?"
+                  &quot;We could make a delicious Caprese Salad. Would you like me to guide you through it?&quot;
                 </p>
               </div>
             </motion.div>

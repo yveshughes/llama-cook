@@ -277,7 +277,7 @@ export default function LlamaPOC() {
               <div className="p-4 bg-purple-50 rounded-lg border border-purple-200">
                 <h3 className="font-semibold text-gray-900 mb-2">BoundaryML Integration</h3>
                 <p className="text-sm text-gray-600">
-                  Structures Llama's responses into consistent JSON with timed steps, ingredient quantities, and cooking actions.
+                  Structures Llama&apos;s responses into consistent JSON with timed steps, ingredient quantities, and cooking actions.
                 </p>
               </div>
 
@@ -285,7 +285,7 @@ export default function LlamaPOC() {
               <div className="p-6 bg-olive/10 rounded-lg">
                 <h3 className="font-semibold text-gray-900 mb-2">Visual Context Integration</h3>
                 <p className="text-sm text-gray-600">
-                  Llama-4-Scout receives real-time ingredient data from SAM2, enabling contextual recipe suggestions based on what's actually in your kitchen.
+                  Llama-4-Scout receives real-time ingredient data from SAM2, enabling contextual recipe suggestions based on what&apos;s actually in your kitchen.
                 </p>
                 <Link 
                   href="/poc/sam2"
@@ -321,7 +321,7 @@ export default function LlamaPOC() {
               <div className="bg-white p-6 rounded-lg border border-gray-200">
                 <h3 className="font-semibold text-gray-900 mb-2">Skill Adaptation</h3>
                 <p className="text-sm text-gray-600">
-                  Adjusts complexity and detail based on user's cooking experience
+                  Adjusts complexity and detail based on user&apos;s cooking experience
                 </p>
               </div>
             </div>

@@ -272,7 +272,7 @@ export default function VoicePOC() {
                   <div className="p-4 bg-orange-50 rounded-lg border border-orange-200">
                     <h3 className="font-semibold text-gray-900 mb-2">1. Wake Word Detection</h3>
                     <p className="text-sm text-gray-600 mb-2">
-                      AWS Transcribe continuously monitors for "Sous Chef" wake word using streaming transcription.
+                      AWS Transcribe continuously monitors for &quot;Sous Chef&quot; wake word using streaming transcription.
                     </p>
                     <code className="text-xs bg-gray-100 px-2 py-1 rounded">
                       transcribeStreaming.startStreamTranscription()
@@ -334,11 +334,11 @@ export default function VoicePOC() {
               <div className="p-6 bg-olive/10 rounded-lg">
                 <h3 className="font-semibold text-gray-900 mb-3">Example Voice Commands</h3>
                 <ul className="text-sm text-gray-600 space-y-2">
-                  <li>• "Sous Chef, what can I make with these ingredients?"</li>
-                  <li>• "Sous Chef, how do I prepare the tomatoes?"</li>
-                  <li>• "Sous Chef, set a timer for 5 minutes"</li>
-                  <li>• "Sous Chef, what's the next step?"</li>
-                  <li>• "Sous Chef, I need a vegetarian alternative"</li>
+                  <li>• &quot;Sous Chef, what can I make with these ingredients?&quot;</li>
+                  <li>• &quot;Sous Chef, how do I prepare the tomatoes?&quot;</li>
+                  <li>• &quot;Sous Chef, set a timer for 5 minutes&quot;</li>
+                  <li>• &quot;Sous Chef, what&apos;s the next step?&quot;</li>
+                  <li>• &quot;Sous Chef, I need a vegetarian alternative&quot;</li>
                 </ul>
                 <Link 
                   href="/demo"

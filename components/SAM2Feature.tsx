@@ -61,7 +61,7 @@ export default function SAM2Feature() {
             </div>
             
             <p className="text-lg text-gray-600 mb-8">
-              SAM2's streaming architecture processes video frames individually with per-session memory, enabling real-time interactive object tracking with a single click.
+              SAM2&apos;s streaming architecture processes video frames individually with per-session memory, enabling real-time interactive object tracking with a single click.
             </p>
             
             <div className="space-y-4">

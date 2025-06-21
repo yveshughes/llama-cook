@@ -71,7 +71,7 @@ export default function HeroSection() {
                 </svg>
                 <div>
                   <h3 className="font-semibold text-gray-900">Low-Latency Voice Control</h3>
-                  <p className="text-gray-600">Scout's efficiency enables seamless hands-free cooking</p>
+                  <p className="text-gray-600">Scout&apos;s efficiency enables seamless hands-free cooking</p>
                 </div>
               </motion.div>
             </div>

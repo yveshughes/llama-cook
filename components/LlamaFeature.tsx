@@ -43,7 +43,7 @@ export default function LlamaFeature() {
                 </div>
                 <div className="ml-4">
                   <h3 className="text-lg font-semibold text-gray-900">Instant Recipe Generation</h3>
-                  <p className="mt-1 text-gray-600">Scout's 16-expert architecture creates recipes in milliseconds</p>
+                  <p className="mt-1 text-gray-600">Scout&apos;s 16-expert architecture creates recipes in milliseconds</p>
                 </div>
               </motion.div>
               
