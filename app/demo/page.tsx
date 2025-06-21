@@ -61,7 +61,7 @@ export default function DemoPage() {
             ].map((feature) => (
               <button
                 key={feature.id}
-                onClick={() => setActiveFeature(feature.id as any)}
+                onClick={() => setActiveFeature(feature.id as 'all' | 'sam2' | 'llama' | 'vjepa' | 'voice')}
                 className={`px-4 py-2 rounded-full transition-all ${
                   activeFeature === feature.id 
                     ? `${feature.color} text-white` 
@@ -115,7 +115,7 @@ export default function DemoPage() {
                 
                 {(activeFeature === 'all' || activeFeature === 'voice') && (
                   <div className="absolute bottom-4 left-4 bg-orange-500/90 text-white px-3 py-1 rounded-full text-sm animate-pulse">
-                    🎤 Listening for "Sous Chef"
+                    🎤 Listening for &quot;Sous Chef&quot;
                   </div>
                 )}
               </div>
@@ -212,12 +212,12 @@ export default function DemoPage() {
                   Voice Control Active
                 </h3>
                 <p className="text-sm text-gray-600 mb-3">
-                  Say "Sous Chef" followed by your command
+                  Say &quot;Sous Chef&quot; followed by your command
                 </p>
                 <div className="bg-orange-50 p-3 rounded-lg">
                   <p className="text-xs text-gray-500 mb-1">Last command:</p>
                   <p className="text-sm text-gray-700 italic">
-                    "Sous Chef, how long should I let it rest?"
+                    &quot;Sous Chef, how long should I let it rest?&quot;
                   </p>
                 </div>
               </div>
