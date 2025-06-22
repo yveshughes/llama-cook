@@ -31,7 +31,7 @@ export default function SAM2POC() {
   const handleTimeUpdate = useCallback((time: number) => {
     setCurrentTime(time);
     
-    const sequence = sequences[currentVideoId];
+    const sequence = sequences[currentVideoId as keyof typeof sequences];
     if (!sequence) return;
     
     // Get raw detections at current time

@@ -29,7 +29,7 @@ export default function AROverlay({
 }: AROverlayProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const animatedDetectionsRef = useRef<Map<string, AnimatedDetection>>(new Map());
-  const animationFrameRef = useRef<number>();
+  const animationFrameRef = useRef<number | undefined>(undefined);
   const [canvasSize, setCanvasSize] = useState({ width: 0, height: 0 });
 
   // Update canvas size on mount and resize
