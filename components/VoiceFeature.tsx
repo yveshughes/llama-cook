@@ -6,6 +6,20 @@ import Link from 'next/link';
 
 export default function VoiceFeature() {
   const [isLiveMode, setIsLiveMode] = useState(false);
+  const [triggerTransition, setTriggerTransition] = useState(false);
+
+  const handleTriggerTransition = () => {
+    setTriggerTransition(true);
+    // Scroll to Llama section after a short delay
+    setTimeout(() => {
+      const llamaSection = document.getElementById('llama');
+      if (llamaSection) {
+        llamaSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        // Trigger the Llama section animation
+        window.dispatchEvent(new Event('triggerLlamaTransition'));
+      }
+    }, 500);
+  };
 
   return (
     <section className="py-24 sm:py-32 bg-gradient-to-br from-cream to-white">
@@ -75,8 +89,16 @@ export default function VoiceFeature() {
               <motion.div 
                 className="bg-black rounded-xl shadow-lg p-6 border border-gray-800"
                 initial={{ opacity: 0, y: -20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.2 }}
+                animate={{ 
+                  opacity: triggerTransition ? 0 : 1,
+                  y: triggerTransition ? 100 : 0,
+                  scale: triggerTransition ? 0.8 : 1
+                }}
+                transition={{ 
+                  delay: triggerTransition ? 0 : 0.2,
+                  duration: triggerTransition ? 0.8 : 0.5,
+                  ease: triggerTransition ? "easeInOut" : "easeOut"
+                }}
                 viewport={{ once: true }}
               >
                 <div className="flex items-center justify-between mb-4">
@@ -128,6 +150,14 @@ export default function VoiceFeature() {
                   </div>
                   {isLiveMode && (
                     <span className="text-gray-500">Say &quot;Sous Chef&quot; to activate</span>
+                  )}
+                  {!isLiveMode && !triggerTransition && (
+                    <button
+                      onClick={handleTriggerTransition}
+                      className="px-4 py-1.5 bg-herb-green text-white text-xs rounded-full hover:bg-herb-green/90 transition-colors"
+                    >
+                      Process →
+                    </button>
                   )}
                 </div>
               </motion.div>

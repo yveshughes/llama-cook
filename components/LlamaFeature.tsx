@@ -1,9 +1,28 @@
 'use client';
 
-import { motion } from 'framer-motion';
+import { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
+import TypewriterText from './TypewriterText';
 
 export default function LlamaFeature() {
+  const [showTranscription, setShowTranscription] = useState(false);
+  const [showResponse, setShowResponse] = useState(false);
+
+  useEffect(() => {
+    // Listen for custom event from Voice section
+    const handleTransitionTrigger = () => {
+      setShowTranscription(true);
+      setTimeout(() => {
+        setShowResponse(true);
+      }, 1000);
+    };
+
+    window.addEventListener('triggerLlamaTransition', handleTransitionTrigger);
+
+    return () => window.removeEventListener('triggerLlamaTransition', handleTransitionTrigger);
+  }, []);
+
   return (
     <section className="py-24 sm:py-32 bg-white">
       <div className="mx-auto max-w-7xl px-6 lg:px-8">
@@ -25,6 +44,49 @@ export default function LlamaFeature() {
             </p>
           </motion.div>
         </div>
+
+        {/* Animated Transcription Box */}
+        <AnimatePresence>
+          {showTranscription && (
+            <motion.div
+              initial={{ opacity: 0, y: -50, scale: 0.8 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: 50 }}
+              transition={{ duration: 0.6, ease: "easeOut" }}
+              className="mb-12"
+            >
+              <div className="bg-black rounded-xl shadow-lg p-6 border border-gray-800 max-w-2xl mx-auto">
+                <div className="flex items-center justify-between mb-4">
+                  <h4 className="font-semibold text-white">Processing Request</h4>
+                  <div className="flex items-center">
+                    <div className="w-2 h-2 bg-golden rounded-full animate-pulse mr-2"></div>
+                    <span className="text-xs text-golden">Analyzing</span>
+                  </div>
+                </div>
+                <div className="bg-gray-900 rounded-lg p-4 font-mono">
+                  <p className="text-sm mb-2">
+                    <span className="text-orange-400">&quot;</span>
+                    <span className="text-herb-green font-bold">Sous Chef</span>
+                    <span className="text-white">, what can I do with these ingredients?</span>
+                    <span className="text-orange-400">&quot;</span>
+                  </p>
+                  {showResponse && (
+                    <div className="mt-4 pt-4 border-t border-gray-700">
+                      <span className="text-golden text-xs">Llama-4-Scout-17B:</span>
+                      <p className="text-white text-sm mt-1">
+                        <TypewriterText 
+                          text="I can see you have fresh tomatoes, mozzarella, and basil. These are perfect for a classic Caprese Salad! Would you like me to guide you through the preparation?"
+                          speed={30}
+                          className="text-white"
+                        />
+                      </p>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
           {/* Left side - Description */}
