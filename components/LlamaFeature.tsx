@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import TypewriterText from './TypewriterText';
+import AudioPlayer from './AudioPlayer';
 
 interface LlamaFeatureProps {
   liveResponse?: {
@@ -180,24 +181,30 @@ export default function LlamaFeature({ liveResponse }: LlamaFeatureProps) {
                       </div>
                     </div>
                   ) : liveResponse.response ? (
-                    <motion.div 
-                      className="text-white text-sm"
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      transition={{ duration: 0.5 }}
-                    >
-                      {liveResponse.response.split('\n').map((line, index) => {
-                        if (line.trim().startsWith('*')) {
-                          return (
-                            <div key={index} className="ml-4 my-1">
-                              <span className="text-golden">•</span>
-                              <span className="ml-2">{line.substring(1).trim()}</span>
-                            </div>
-                          );
-                        }
-                        return line.trim() ? <p key={index} className="my-2">{line}</p> : null;
-                      })}
-                    </motion.div>
+                    <>
+                      <motion.div 
+                        className="text-white text-sm"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ duration: 0.5 }}
+                      >
+                        {liveResponse.response.split('\n').map((line, index) => {
+                          if (line.trim().startsWith('*')) {
+                            return (
+                              <div key={index} className="ml-4 my-1">
+                                <span className="text-golden">•</span>
+                                <span className="ml-2">{line.substring(1).trim()}</span>
+                              </div>
+                            );
+                          }
+                          return line.trim() ? <p key={index} className="my-2">{line}</p> : null;
+                        })}
+                      </motion.div>
+                      {/* Audio player for the response */}
+                      <div className="mt-4 pt-4 border-t border-gray-700">
+                        <AudioPlayer text={liveResponse.response} />
+                      </div>
+                    </>
                   ) : null}
                 </div>
               </div>
@@ -292,6 +299,10 @@ export default function LlamaFeature({ liveResponse }: LlamaFeatureProps) {
                           <div><span className="text-golden">•</span><span className="ml-2">Salt</span></div>
                           <div><span className="text-golden">•</span><span className="ml-2">Black pepper</span></div>
                           <div><span className="text-golden">•</span><span className="ml-2">Balsamic vinegar (optional)</span></div>
+                        </div>
+                        {/* Audio player for demo */}
+                        <div className="mt-4 pt-4 border-t border-gray-700">
+                          <AudioPlayer text="Looks like we can make a delicious Caprese Salad! It's a perfect appetizer that only takes about 5 minutes to prepare. You've got all the ingredients: Fresh tomatoes, Mozzarella cheese, Fresh basil leaves, Extra virgin olive oil, Salt, Black pepper, and Balsamic vinegar." />
                         </div>
                       </motion.div>
                     </div>

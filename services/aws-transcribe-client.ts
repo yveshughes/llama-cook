@@ -102,6 +102,10 @@ export class TranscribeClient {
   private wakeWord = 'sous chef';
   private wakeWordActive = false;
   private commandStartTime: Date | null = null;
+  private sessionTimeout: NodeJS.Timeout | null = null;
+  private sessionStartTime: Date | null = null;
+  private shouldStopStream = false;
+  private streamAbortController: AbortController | null = null;
   
   async initialize(): Promise<void> {
     console.log('Initializing TranscribeClient...');
@@ -138,11 +142,27 @@ export class TranscribeClient {
     onError?: (error: Error) => void
   ): Promise<void> {
     try {
+      // Stop any existing session first
+      if (this.isConnected) {
+        console.log('Stopping existing session before starting new one...');
+        await this.stopTranscription();
+        // Wait a bit to ensure clean closure
+        await new Promise(resolve => setTimeout(resolve, 500));
+      }
+      
       if (!this.client) {
         await this.initialize();
       }
       
       console.log('Starting transcription...');
+      this.shouldStopStream = false;
+      this.sessionStartTime = new Date();
+      
+      // Set up 1-minute timeout
+      this.sessionTimeout = setTimeout(() => {
+        console.log('Session timeout reached (1 minute), closing gracefully...');
+        this.stopTranscription();
+      }, 60000); // 60 seconds
       
       this.audioProcessor = new AudioProcessor();
       const audioChunks: Uint8Array[] = [];
@@ -152,10 +172,11 @@ export class TranscribeClient {
         audioChunks.push(chunk);
       });
       
-      // Create audio stream generator
+      // Create audio stream generator with proper closure
+      const self = this;
       async function* audioStreamGenerator() {
         console.log('Audio stream generator started');
-        while (true) {
+        while (!self.shouldStopStream) {
           if (audioChunks.length > 0) {
             const chunk = audioChunks.shift()!;
             yield { AudioEvent: { AudioChunk: chunk } };
@@ -164,6 +185,7 @@ export class TranscribeClient {
             await new Promise(resolve => setTimeout(resolve, 100));
           }
         }
+        console.log('Audio stream generator stopped');
       }
       
       // Start transcription
@@ -188,13 +210,31 @@ export class TranscribeClient {
           }
         }
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Transcription error:', error);
       this.isConnected = false;
-      if (onError) {
+      
+      // Clear timeout if set
+      if (this.sessionTimeout) {
+        clearTimeout(this.sessionTimeout);
+        this.sessionTimeout = null;
+      }
+      
+      // Only propagate error if it's not a graceful shutdown
+      if (!this.shouldStopStream && onError) {
+        // Handle specific AWS errors gracefully
+        if (error.name === 'BadRequestException') {
+          console.log('AWS session issue - this can happen when switching modes or reconnecting');
+          // Don't propagate BadRequestException to user
+          return;
+        }
         onError(error as Error);
       }
-      throw error;
+      
+      // Don't throw if it was a graceful shutdown
+      if (!this.shouldStopStream) {
+        throw error;
+      }
     }
   }
   
@@ -292,13 +332,28 @@ export class TranscribeClient {
   
   async stopTranscription(): Promise<void> {
     console.log('Stopping transcription...');
+    this.shouldStopStream = true;
     this.isConnected = false;
     this.wakeWordActive = false;
     this.commandStartTime = null;
     
+    // Clear session timeout
+    if (this.sessionTimeout) {
+      clearTimeout(this.sessionTimeout);
+      this.sessionTimeout = null;
+    }
+    
+    // Stop audio processor
     if (this.audioProcessor) {
       this.audioProcessor.stop();
       this.audioProcessor = null;
+    }
+    
+    // Log session duration
+    if (this.sessionStartTime) {
+      const duration = (new Date().getTime() - this.sessionStartTime.getTime()) / 1000;
+      console.log(`Session duration: ${duration.toFixed(1)} seconds`);
+      this.sessionStartTime = null;
     }
   }
   
