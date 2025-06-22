@@ -9,6 +9,7 @@ import AROverlay from './components/AROverlay';
 import ControlPanel from './components/ControlPanel';
 import InfoPanel from './components/InfoPanel';
 import QRCodeDisplay from './components/QRCodeDisplay';
+import LiveCameraView from './components/LiveCameraView';
 import { videos } from './data/videos';
 import { sequences, getDetectionsAtTime, interpolateDetection, Detection } from './data/detections';
 
@@ -20,6 +21,8 @@ export default function SAM2POC() {
   const [videoMetadata, setVideoMetadata] = useState({ width: 640, height: 480 });
   const [highlightedId, setHighlightedId] = useState<string | null>(null);
   const [currentDetections, setCurrentDetections] = useState<Detection[]>([]);
+  const [liveSessionId, setLiveSessionId] = useState<string>('');
+  const [showQRCode, setShowQRCode] = useState(true);
   
   const videoPlayerRef = useRef<VideoPlayerRef>(null);
   const lastDetectionsRef = useRef<Map<string, Detection>>(new Map());
@@ -137,15 +140,31 @@ export default function SAM2POC() {
         <section className="py-6">
           <div className="mx-auto max-w-7xl px-6 lg:px-8">
             <div className="bg-black rounded-xl overflow-hidden shadow-2xl aspect-video relative">
-              <div className="absolute inset-0 flex items-center justify-center">
-                <QRCodeDisplay />
-              </div>
+              {showQRCode ? (
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <QRCodeDisplay 
+                    onSessionCreated={(sessionId) => {
+                      setLiveSessionId(sessionId);
+                      // Don't automatically hide QR code - wait for actual connection
+                    }}
+                  />
+                </div>
+              ) : (
+                <LiveCameraView 
+                  sessionId={liveSessionId}
+                  serverUrl={process.env.NEXT_PUBLIC_SAM2_SERVER_URL || 'http://localhost:5000'}
+                />
+              )}
               
-              {/* Live indicators */}
-              <div className="absolute top-4 left-4 bg-red-600 text-white px-3 py-1 rounded-full text-sm flex items-center">
-                <span className="w-2 h-2 bg-white rounded-full mr-2 animate-pulse"></span>
-                LIVE
-              </div>
+              {/* Toggle button to switch between QR and Live view */}
+              {liveSessionId && (
+                <button
+                  onClick={() => setShowQRCode(!showQRCode)}
+                  className="absolute top-4 right-4 bg-white/20 backdrop-blur-sm text-white px-3 py-1 rounded-lg text-sm hover:bg-white/30 transition-colors"
+                >
+                  {showQRCode ? 'Show Live View' : 'Show QR Code'}
+                </button>
+              )}
             </div>
           </div>
         </section>

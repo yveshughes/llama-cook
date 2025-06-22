@@ -5,9 +5,10 @@ import QRCode from 'qrcode';
 
 interface QRCodeDisplayProps {
   className?: string;
+  onSessionCreated?: (sessionId: string) => void;
 }
 
-export default function QRCodeDisplay({ className = '' }: QRCodeDisplayProps) {
+export default function QRCodeDisplay({ className = '', onSessionCreated }: QRCodeDisplayProps) {
   const [qrCodeUrl, setQrCodeUrl] = useState<string>('');
   const [serverUrl, setServerUrl] = useState<string>('');
   const [isLoading, setIsLoading] = useState(true);
@@ -19,12 +20,12 @@ export default function QRCodeDisplay({ className = '' }: QRCodeDisplayProps) {
         // Get the SAM2 server URL from environment or use default
         const sam2ServerUrl = process.env.NEXT_PUBLIC_SAM2_SERVER_URL || 'http://localhost:5000';
         
-        // Create a deep link URL that the iPhone app will handle
-        // This could be a custom URL scheme or a web URL that redirects
-        const deepLinkUrl = `${window.location.origin}/api/sam2/connect?server=${encodeURIComponent(sam2ServerUrl)}`;
+        // Create URL for camera page with server parameter
+        const sessionId = `session_${Date.now()}`;
+        const cameraUrl = `${window.location.origin}/camera?server=${encodeURIComponent(sam2ServerUrl)}&session=${sessionId}`;
         
         // Generate QR code
-        const qrDataUrl = await QRCode.toDataURL(deepLinkUrl, {
+        const qrDataUrl = await QRCode.toDataURL(cameraUrl, {
           width: 256,
           margin: 2,
           color: {
@@ -36,6 +37,11 @@ export default function QRCodeDisplay({ className = '' }: QRCodeDisplayProps) {
         setQrCodeUrl(qrDataUrl);
         setServerUrl(sam2ServerUrl);
         setIsLoading(false);
+        
+        // Notify parent component of session ID
+        if (onSessionCreated) {
+          onSessionCreated(sessionId);
+        }
       } catch (err) {
         console.error('Error generating QR code:', err);
         setError('Failed to generate QR code');
@@ -116,8 +122,9 @@ export default function QRCodeDisplay({ className = '' }: QRCodeDisplayProps) {
         {/* Debug info in development */}
         {process.env.NODE_ENV === 'development' && (
           <div className="mt-4 p-3 bg-gray-100 rounded text-xs text-gray-600 text-left">
-            <p className="font-mono">Server: {serverUrl}</p>
-            <p className="font-mono mt-1">Status: Connected</p>
+            <p className="font-mono break-all">Camera URL: {window.location.origin}/camera</p>
+            <p className="font-mono break-all mt-1">Server: {serverUrl}</p>
+            <p className="font-mono mt-1">Status: {error ? 'Error' : 'Ready'}</p>
           </div>
         )}
       </div>

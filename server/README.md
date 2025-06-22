@@ -7,7 +7,12 @@ This directory contains the server components for running SAM2 (Segment Anything
 For testing without the actual SAM2 model:
 
 ```bash
-# Install dependencies
+# Option 1: Using venv (recommended)
+python -m venv venv
+source venv/bin/activate  # On Windows: venv\Scripts\activate
+pip install -r requirements.txt
+
+# Option 2: Without venv (quick testing)
 pip install flask flask-cors numpy
 
 # Run the mock server
