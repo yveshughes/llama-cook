@@ -8,7 +8,7 @@ import VideoPlayer, { VideoPlayerRef } from './components/VideoPlayer';
 import AROverlay from './components/AROverlay';
 import ControlPanel from './components/ControlPanel';
 import InfoPanel from './components/InfoPanel';
-import { videos, getVideoById } from './data/videos';
+import { videos } from './data/videos';
 import { sequences, getDetectionsAtTime, interpolateDetection, Detection } from './data/detections';
 
 export default function SAM2POC() {
@@ -239,7 +239,7 @@ export default function SAM2POC() {
                   <h4 className="text-sm font-semibold text-gray-900 mb-2">About Caprese Salad</h4>
                   <p className="text-xs text-gray-600 mb-3">
                     A timeless Italian classic featuring the colors of the Italian flag - red tomatoes, 
-                    white mozzarella, and green basil. Perfect for showcasing SAM2's ability to track 
+                    white mozzarella, and green basil. Perfect for showcasing SAM2&apos;s ability to track 
                     multiple ingredients through preparation stages.
                   </p>
                   <div className="flex flex-wrap gap-2">

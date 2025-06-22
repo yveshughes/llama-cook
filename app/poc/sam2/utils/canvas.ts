@@ -92,7 +92,7 @@ export function drawBoundingBox(options: DrawOptions) {
 
 // Draw AR-style label
 export function drawLabel(options: DrawOptions) {
-  const { ctx, detection, isHighlighted = false, animationProgress = 1 } = options;
+  const { ctx, detection, animationProgress = 1 } = options;
   
   const [x, y, width] = scaleCoordinates(
     detection.bbox,
