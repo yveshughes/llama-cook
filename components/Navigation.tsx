@@ -85,9 +85,13 @@ export default function Navigation() {
               <img 
                 src="/logo.svg" 
                 alt="Llama-Cook Logo" 
-                className="h-8 w-auto"
+                className={`h-8 w-auto transition-opacity duration-300 ${
+                  isScrolled ? 'opacity-100' : 'opacity-0'
+                }`}
               />
-              <span className="text-xl font-bold text-gray-900">Llama-Cook</span>
+              <span className={`text-xl font-bold text-gray-900 transition-opacity duration-300 ${
+                isScrolled ? 'opacity-100' : 'opacity-0'
+              }`}>Llama-Cook</span>
             </button>
           </motion.div>
 

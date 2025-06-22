@@ -4,7 +4,7 @@ import { motion } from 'framer-motion';
 
 export default function HeroSection() {
   return (
-    <section className="relative overflow-hidden pt-32 pb-24 sm:pt-40 sm:pb-32">
+    <section className="relative overflow-hidden pt-12 pb-24 sm:pt-16 sm:pb-32">
       <div className="mx-auto max-w-7xl px-6 lg:px-8">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
           {/* Left side - Description */}
@@ -13,9 +13,13 @@ export default function HeroSection() {
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.8 }}
           >
-            <h1 className="text-4xl font-bold tracking-tight text-gray-900 sm:text-6xl mb-6">
-              Llama-Cook
-            </h1>
+            <div className="mb-8 flex justify-center">
+              <img 
+                src="/logo.svg" 
+                alt="Llama-Cook" 
+                className="h-96 sm:h-[28rem] lg:h-[32rem] w-auto"
+              />
+            </div>
             <p className="text-xl text-gray-600 mb-8">
               Your lightning-fast AI cooking companion, delivering instant guidance and predictive assistance through every step.
             </p>
