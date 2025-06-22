@@ -1,25 +1,46 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 
 export default function VoiceFeature() {
   const [isLiveMode, setIsLiveMode] = useState(false);
   const [triggerTransition, setTriggerTransition] = useState(false);
+  const [scrollProgress, setScrollProgress] = useState(0);
 
-  const handleTriggerTransition = () => {
-    setTriggerTransition(true);
-    // Scroll to Llama section after a short delay
-    setTimeout(() => {
+  useEffect(() => {
+    if (isLiveMode) return; // Only work in demo mode
+
+    const handleScroll = () => {
+      const voiceSection = document.getElementById('voice');
       const llamaSection = document.getElementById('llama');
-      if (llamaSection) {
-        llamaSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      
+      if (!voiceSection || !llamaSection) return;
+      
+      const voiceRect = voiceSection.getBoundingClientRect();
+      
+      // Calculate when voice section is scrolling out and llama section is coming in
+      const voiceBottom = voiceRect.bottom;
+      const windowHeight = window.innerHeight;
+      
+      // Start transition when voice section is halfway out of view
+      if (voiceBottom < windowHeight * 0.5 && !triggerTransition) {
+        setTriggerTransition(true);
         // Trigger the Llama section animation
-        window.dispatchEvent(new Event('triggerLlamaTransition'));
+        setTimeout(() => {
+          window.dispatchEvent(new Event('triggerLlamaTransition'));
+        }, 300);
       }
-    }, 500);
-  };
+      
+      // Calculate scroll progress for smooth animation
+      const progress = Math.max(0, Math.min(1, (windowHeight - voiceBottom) / windowHeight));
+      setScrollProgress(progress);
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [isLiveMode, triggerTransition]);
 
   return (
     <section className="py-24 sm:py-32 bg-gradient-to-br from-cream to-white">
@@ -90,14 +111,22 @@ export default function VoiceFeature() {
                 className="bg-black rounded-xl shadow-lg p-6 border border-gray-800"
                 initial={{ opacity: 0, y: -20 }}
                 animate={{ 
-                  opacity: triggerTransition ? 0 : 1,
-                  y: triggerTransition ? 100 : 0,
-                  scale: triggerTransition ? 0.8 : 1
+                  opacity: !isLiveMode && scrollProgress > 0.8 ? 0 : 1,
+                  y: !isLiveMode ? scrollProgress * 300 : 0,
+                  scale: !isLiveMode ? 1 + (scrollProgress * 0.1) : 1,
+                  zIndex: !isLiveMode && scrollProgress > 0 ? 50 : 'auto'
+                }}
+                style={{
+                  position: !isLiveMode && scrollProgress > 0.1 ? 'fixed' : 'relative',
+                  top: !isLiveMode && scrollProgress > 0.1 ? '20vh' : 'auto',
+                  left: !isLiveMode && scrollProgress > 0.1 ? '50%' : 'auto',
+                  transform: !isLiveMode && scrollProgress > 0.1 ? 'translateX(-50%)' : 'none',
+                  maxWidth: !isLiveMode && scrollProgress > 0.1 ? '600px' : '100%',
+                  width: !isLiveMode && scrollProgress > 0.1 ? '90%' : '100%',
                 }}
                 transition={{ 
-                  delay: triggerTransition ? 0 : 0.2,
-                  duration: triggerTransition ? 0.8 : 0.5,
-                  ease: triggerTransition ? "easeInOut" : "easeOut"
+                  duration: 0.1,
+                  ease: "linear"
                 }}
                 viewport={{ once: true }}
               >
@@ -151,13 +180,8 @@ export default function VoiceFeature() {
                   {isLiveMode && (
                     <span className="text-gray-500">Say &quot;Sous Chef&quot; to activate</span>
                   )}
-                  {!isLiveMode && !triggerTransition && (
-                    <button
-                      onClick={handleTriggerTransition}
-                      className="px-4 py-1.5 bg-herb-green text-white text-xs rounded-full hover:bg-herb-green/90 transition-colors"
-                    >
-                      Process →
-                    </button>
+                  {!isLiveMode && scrollProgress < 0.1 && (
+                    <span className="text-gray-400 text-xs">Scroll down to process</span>
                   )}
                 </div>
               </motion.div>
