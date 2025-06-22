@@ -1,9 +1,9 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 
-export default function CameraPage() {
+function CameraPageContent() {
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [isStreaming, setIsStreaming] = useState(false);
@@ -18,165 +18,145 @@ export default function CameraPage() {
 
   const startCamera = async () => {
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({
-        video: {
+      const stream = await navigator.mediaDevices.getUserMedia({ 
+        video: { 
           facingMode: 'environment',
           width: { ideal: 1280 },
           height: { ideal: 720 }
-        }
+        } 
       });
-
+      
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
       }
     } catch (err) {
       console.error('Error accessing camera:', err);
-      setError('Camera access denied. Please allow camera permissions.');
+      setError('Failed to access camera. Please ensure you have granted camera permissions.');
     }
+  };
+
+  const captureFrame = () => {
+    if (!videoRef.current || !canvasRef.current) return null;
+    
+    const video = videoRef.current;
+    const canvas = canvasRef.current;
+    const context = canvas.getContext('2d');
+    
+    if (!context) return null;
+    
+    // Set canvas dimensions to match video
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+    
+    // Draw video frame to canvas
+    context.drawImage(video, 0, 0, canvas.width, canvas.height);
+    
+    // Convert to base64
+    return canvas.toDataURL('image/jpeg', 0.8);
   };
 
   const startStreaming = async () => {
-    if (!canvasRef.current || !videoRef.current) return;
-
     setIsStreaming(true);
-    const canvas = canvasRef.current;
-    const video = videoRef.current;
-    const ctx = canvas.getContext('2d');
-
-    // Notify server that streaming is starting
-    try {
-      await fetch(`${serverUrl}/stream/start`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          session_id: sessionId,
-          client_info: {
-            userAgent: navigator.userAgent,
-            timestamp: new Date().toISOString()
-          }
-        })
-      });
-    } catch (err) {
-      console.error('Error starting stream:', err);
-    }
-
-    // Stream frames to server
-    const streamFrame = async () => {
-      if (!isStreaming || !ctx) return;
-
-      // Draw video frame to canvas
-      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+    setError('');
+    
+    // Send frames every 100ms (10 FPS)
+    const interval = setInterval(async () => {
+      if (!isStreaming) {
+        clearInterval(interval);
+        return;
+      }
       
-      // Convert to base64
-      const imageData = canvas.toDataURL('image/jpeg', 0.8);
-      const base64Data = imageData.split(',')[1];
-
-      // Send to server
+      const frameData = captureFrame();
+      if (!frameData) return;
+      
       try {
-        const response = await fetch(`${serverUrl}/track`, {
+        const response = await fetch(`${serverUrl}/process`, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: {
+            'Content-Type': 'application/json',
+          },
           body: JSON.stringify({
             session_id: sessionId,
-            image: base64Data,
+            frame: frameData,
             timestamp: Date.now()
-          })
+          }),
         });
-
-        if (response.ok) {
-          const data = await response.json();
-          // Could display detection results here
-          console.log('Detections:', data.detections);
+        
+        if (!response.ok) {
+          console.error('Failed to send frame:', response.statusText);
         }
       } catch (err) {
         console.error('Error sending frame:', err);
+        setError('Failed to connect to server. Please check your connection.');
+        setIsStreaming(false);
+        clearInterval(interval);
       }
-
-      // Continue streaming at ~10 FPS
-      if (isStreaming) {
-        setTimeout(streamFrame, 100);
-      }
-    };
-
-    streamFrame();
+    }, 100);
+    
+    // Store interval ID for cleanup
+    return () => clearInterval(interval);
   };
 
-  const stopStreaming = async () => {
+  const stopStreaming = () => {
     setIsStreaming(false);
-    
-    // Notify server that streaming is stopping
-    try {
-      await fetch(`${serverUrl}/stream/stop`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ session_id: sessionId })
-      });
-    } catch (err) {
-      console.error('Error stopping stream:', err);
-    }
   };
 
   return (
-    <div className="min-h-screen bg-black text-white">
-      <div className="max-w-4xl mx-auto p-4">
-        <h1 className="text-2xl font-bold mb-4 text-center">Llama Cook Camera</h1>
+    <div className="min-h-screen bg-gray-950 text-white p-4">
+      <div className="max-w-2xl mx-auto">
+        <h1 className="text-2xl font-bold text-center mb-6">Llama-Cook Camera</h1>
         
         {error && (
-          <div className="bg-red-500/20 border border-red-500 rounded-lg p-4 mb-4">
-            <p className="text-red-300">{error}</p>
+          <div className="bg-red-500/10 border border-red-500 text-red-500 p-4 rounded-lg mb-4">
+            {error}
           </div>
         )}
-
-        <div className="relative aspect-video bg-gray-900 rounded-lg overflow-hidden mb-4">
+        
+        <div className="relative bg-black rounded-lg overflow-hidden mb-4">
           <video
             ref={videoRef}
             autoPlay
             playsInline
             muted
-            className="w-full h-full object-cover"
+            className="w-full h-auto"
           />
+          <canvas ref={canvasRef} className="hidden" />
           
-          {/* Hidden canvas for frame capture */}
-          <canvas
-            ref={canvasRef}
-            width={640}
-            height={480}
-            className="hidden"
-          />
-
-          {/* Status overlay */}
           {isStreaming && (
-            <div className="absolute top-4 left-4 bg-red-600 text-white px-3 py-1 rounded-full text-sm flex items-center">
-              <span className="w-2 h-2 bg-white rounded-full mr-2 animate-pulse"></span>
-              STREAMING
+            <div className="absolute top-4 right-4 flex items-center gap-2">
+              <div className="w-3 h-3 bg-red-500 rounded-full animate-pulse" />
+              <span className="text-white text-sm font-semibold">LIVE</span>
             </div>
           )}
         </div>
-
-        <div className="flex gap-4 justify-center">
+        
+        <div className="flex gap-4 mb-6">
           {!isStreaming ? (
             <button
               onClick={startStreaming}
-              className="px-8 py-3 bg-herb-green text-white rounded-lg font-semibold hover:bg-herb-green/90 transition-colors"
-              disabled={!!error}
+              className="flex-1 bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors"
             >
               Start Streaming
             </button>
           ) : (
             <button
               onClick={stopStreaming}
-              className="px-8 py-3 bg-red-600 text-white rounded-lg font-semibold hover:bg-red-700 transition-colors"
+              className="flex-1 bg-red-600 hover:bg-red-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors"
             >
               Stop Streaming
             </button>
           )}
         </div>
-
-        <div className="mt-6 text-center text-sm text-gray-400">
-          <p>Session ID: {sessionId}</p>
-          <p>Server: {serverUrl}</p>
+        
+        <div className="bg-gray-900 rounded-lg p-4 mb-4">
+          <h2 className="text-sm font-semibold text-gray-400 mb-2">Connection Details</h2>
+          <div className="space-y-1 text-sm">
+            <p><span className="text-gray-500">Server:</span> {serverUrl}</p>
+            <p><span className="text-gray-500">Session:</span> {sessionId}</p>
+            <p><span className="text-gray-500">Status:</span> {isStreaming ? 'Streaming' : 'Ready'}</p>
+          </div>
         </div>
-
+        
         <div className="mt-8 bg-gray-900 rounded-lg p-4">
           <h2 className="text-lg font-semibold mb-2">Instructions</h2>
           <ol className="list-decimal list-inside space-y-1 text-sm text-gray-300">
@@ -189,5 +169,20 @@ export default function CameraPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function CameraPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-gray-950 text-white flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white mx-auto mb-4"></div>
+          <p>Loading camera...</p>
+        </div>
+      </div>
+    }>
+      <CameraPageContent />
+    </Suspense>
   );
 }

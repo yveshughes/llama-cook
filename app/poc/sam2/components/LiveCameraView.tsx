@@ -14,7 +14,7 @@ export default function LiveCameraView({ sessionId, serverUrl }: LiveCameraViewP
   const [isConnected, setIsConnected] = useState(false);
   const [lastFrame] = useState<string>('');
   const [frameSize] = useState({ width: 640, height: 480 });
-  const intervalRef = useRef<NodeJS.Timeout>();
+  const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     // Poll for updates from the server
