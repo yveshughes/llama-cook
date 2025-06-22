@@ -115,27 +115,9 @@ export function getDetectionsAtTime(sequence: DetectionSequence, currentTime: nu
     return currentTime >= detection.timestamp;
   });
   
-  // Create a map to handle detection lifecycle (some detections replace others)
-  const detectionMap = new Map<string, Detection>();
-  
-  // No transformations needed since we're only showing whole ingredients
-  const transformRules = new Map([]);
-  
-  // Add all visible detections to the map
-  for (const detection of visibleDetections) {
-    detectionMap.set(detection.id, detection);
-  }
-  
-  // Apply transformation rules - remove replaced detections
-  for (const [newId, oldIds] of transformRules) {
-    if (detectionMap.has(newId)) {
-      for (const oldId of oldIds) {
-        detectionMap.delete(oldId);
-      }
-    }
-  }
-  
-  return Array.from(detectionMap.values());
+  // Since we're only showing whole ingredients without transformations,
+  // just return all visible detections
+  return visibleDetections;
 }
 
 // Helper to interpolate position between detections
