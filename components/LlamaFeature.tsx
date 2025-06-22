@@ -115,6 +115,15 @@ export default function LlamaFeature({ liveResponse }: LlamaFeatureProps) {
                   <span className="font-semibold text-gray-900">Structured Output:</span> Powered by BoundaryML for consistent, well-formatted recipe suggestions
                 </p>
               </div>
+              
+              <div className="flex items-start">
+                <div className="flex-shrink-0 mt-1">
+                  <div className="w-2 h-2 bg-golden rounded-full"></div>
+                </div>
+                <p className="ml-4 text-gray-600">
+                  <span className="font-semibold text-gray-900">Voice Synthesis:</span> AWS Polly neural voices bring Sous Chef to life with natural, expressive speech
+                </p>
+              </div>
             </div>
           </motion.div>
           
