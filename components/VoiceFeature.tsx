@@ -1,9 +1,7 @@
 'use client';
 
-import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
-import TypewriterText from './TypewriterText';
 import { useLiveMode } from '@/contexts/LiveModeContext';
 
 export default function VoiceFeature() {
