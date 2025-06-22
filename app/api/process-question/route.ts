@@ -1,5 +1,35 @@
 import { NextRequest, NextResponse } from 'next/server';
 
+// Helper function to ensure structured output
+function formatRecipeResponse(rawResponse: string): string {
+  // If the response already follows our format, return as is
+  if (rawResponse.includes('*') && rawResponse.match(/\*\s+\w+/g)) {
+    return rawResponse;
+  }
+  
+  // Otherwise, try to extract ingredients and format them
+  const lines = rawResponse.split('\n').filter(line => line.trim());
+  const formattedLines: string[] = [];
+  let foundIngredients = false;
+  
+  for (const line of lines) {
+    // Check if this line mentions ingredients
+    if (line.toLowerCase().includes('ingredient') || line.match(/^[-•]\s*\w+/)) {
+      foundIngredients = true;
+      // Convert various bullet formats to our standard
+      const cleaned = line.replace(/^[-•]\s*/, '* ');
+      formattedLines.push(cleaned);
+    } else if (foundIngredients && line.match(/^[A-Za-z]+/)) {
+      // If we're in the ingredients section and see a plain word, format it
+      formattedLines.push(`* ${line}`);
+    } else {
+      formattedLines.push(line);
+    }
+  }
+  
+  return formattedLines.join('\n');
+}
+
 export async function POST(request: NextRequest) {
   try {
     const { question, roomId } = await request.json();
@@ -59,7 +89,20 @@ export async function POST(request: NextRequest) {
         messages: [
           {
             role: 'system',
-            content: 'You are Sous Chef, a helpful cooking assistant. Analyze the ingredients shown in the image and answer cooking-related questions. Be concise and practical.'
+            content: `You are Sous Chef, a helpful kitchen assistant providing thoughtful creative recipes based on the available ingredients shown in images.
+
+When analyzing ingredients and suggesting recipes, always follow this format:
+1. Start with a friendly introduction to the recipe (e.g., "Looks like we can make a delicious [dish name]")
+2. Mention key details like prep time and difficulty
+3. List all visible ingredients in a bullet format
+4. If some common ingredients are missing but likely available, mention them too
+
+Format your ingredient list like this:
+* Ingredient 1
+* Ingredient 2
+* Ingredient 3
+
+Be enthusiastic, helpful, and encouraging!`
           },
           {
             role: 'user',
@@ -77,8 +120,8 @@ export async function POST(request: NextRequest) {
             ]
           }
         ],
-        max_tokens: 500,
-        temperature: 0.7,
+        max_tokens: 800,
+        temperature: 0.8,
       }),
     });
 
@@ -122,9 +165,12 @@ export async function POST(request: NextRequest) {
       answer = 'Received response but unable to parse it. Please check API response format.';
     }
     
+    // Apply formatting to ensure structured output
+    const formattedAnswer = formatRecipeResponse(answer);
+    
     return NextResponse.json({
       question,
-      answer,
+      answer: formattedAnswer,
       timestamp: new Date().toISOString(),
       usage: data.usage
     });

@@ -105,6 +105,15 @@ export default function LlamaFeature({ liveResponse }: LlamaFeatureProps) {
                   <span className="font-semibold text-gray-900">Adaptive Learning:</span> Remembers your preferences for future recommendations
                 </p>
               </div>
+              
+              <div className="flex items-start">
+                <div className="flex-shrink-0 mt-1">
+                  <div className="w-2 h-2 bg-herb-green rounded-full"></div>
+                </div>
+                <p className="ml-4 text-gray-600">
+                  <span className="font-semibold text-gray-900">Structured Output:</span> Powered by BoundaryML for consistent, well-formatted recipe suggestions
+                </p>
+              </div>
             </div>
           </motion.div>
           
@@ -171,14 +180,24 @@ export default function LlamaFeature({ liveResponse }: LlamaFeatureProps) {
                       </div>
                     </div>
                   ) : liveResponse.response ? (
-                    <motion.p 
+                    <motion.div 
                       className="text-white text-sm"
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
                       transition={{ duration: 0.5 }}
                     >
-                      {liveResponse.response}
-                    </motion.p>
+                      {liveResponse.response.split('\n').map((line, index) => {
+                        if (line.trim().startsWith('*')) {
+                          return (
+                            <div key={index} className="ml-4 my-1">
+                              <span className="text-golden">•</span>
+                              <span className="ml-2">{line.substring(1).trim()}</span>
+                            </div>
+                          );
+                        }
+                        return line.trim() ? <p key={index} className="my-2">{line}</p> : null;
+                      })}
+                    </motion.div>
                   ) : null}
                 </div>
               </div>
@@ -212,6 +231,23 @@ export default function LlamaFeature({ liveResponse }: LlamaFeatureProps) {
                   </span>
                 </div>
               </div>
+              {/* Show demo ingredients image when response is shown */}
+              {showResponse && (
+                <motion.div 
+                  className="mb-4"
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ duration: 0.3 }}
+                >
+                  <p className="text-sm font-medium text-gray-400 mb-2">Captured image:</p>
+                  <img 
+                    src="/ingredients.png" 
+                    alt="Demo ingredients" 
+                    className="w-full rounded-lg border border-gray-700"
+                  />
+                </motion.div>
+              )}
+              
               <div className="bg-gray-900 rounded-lg p-4 font-mono min-h-[120px]">
                 {!showResponse ? (
                   <motion.div
@@ -236,14 +272,28 @@ export default function LlamaFeature({ liveResponse }: LlamaFeatureProps) {
                         <span className="text-orange-400">&quot;</span>
                       </p>
                     </div>
-                    <div>
-                      <p className="text-white text-sm">
-                        <TypewriterText 
-                          text="I can see you have fresh tomatoes, mozzarella, and basil. These are perfect for a classic Caprese Salad! 🍅🧀🌿 Would you like me to guide you through the preparation? It takes just 5 minutes and requires no cooking."
-                          speed={30}
-                          className="text-white"
-                        />
-                      </p>
+                    <div className="text-white text-sm">
+                      <TypewriterText 
+                        text="Looks like we can make a delicious Caprese Salad! It's a perfect appetizer that only takes about 5 minutes to prepare."
+                        speed={30}
+                        className="text-white block mb-3"
+                      />
+                      <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ delay: 2.5, duration: 0.5 }}
+                      >
+                        <p className="mb-2">You've got all the ingredients:</p>
+                        <div className="ml-4 space-y-1">
+                          <div><span className="text-golden">•</span><span className="ml-2">Fresh tomatoes</span></div>
+                          <div><span className="text-golden">•</span><span className="ml-2">Mozzarella cheese</span></div>
+                          <div><span className="text-golden">•</span><span className="ml-2">Fresh basil leaves</span></div>
+                          <div><span className="text-golden">•</span><span className="ml-2">Extra virgin olive oil</span></div>
+                          <div><span className="text-golden">•</span><span className="ml-2">Salt</span></div>
+                          <div><span className="text-golden">•</span><span className="ml-2">Black pepper</span></div>
+                          <div><span className="text-golden">•</span><span className="ml-2">Balsamic vinegar (optional)</span></div>
+                        </div>
+                      </motion.div>
                     </div>
                   </div>
                 )}
