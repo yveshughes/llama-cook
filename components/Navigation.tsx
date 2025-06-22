@@ -85,7 +85,7 @@ export default function Navigation() {
               <img 
                 src="/logo.svg" 
                 alt="Llama-Cook Logo" 
-                className={`h-8 w-auto transition-opacity duration-300 ${
+                className={`h-12 w-auto transition-opacity duration-300 ${
                   isScrolled ? 'opacity-100' : 'opacity-0'
                 }`}
               />
