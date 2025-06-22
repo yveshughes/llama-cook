@@ -283,7 +283,7 @@ export default function LlamaFeature({ liveResponse }: LlamaFeatureProps) {
                         animate={{ opacity: 1 }}
                         transition={{ delay: 2.5, duration: 0.5 }}
                       >
-                        <p className="mb-2">You've got all the ingredients:</p>
+                        <p className="mb-2">You&apos;ve got all the ingredients:</p>
                         <div className="ml-4 space-y-1">
                           <div><span className="text-golden">•</span><span className="ml-2">Fresh tomatoes</span></div>
                           <div><span className="text-golden">•</span><span className="ml-2">Mozzarella cheese</span></div>
