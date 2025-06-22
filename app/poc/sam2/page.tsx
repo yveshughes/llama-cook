@@ -8,6 +8,7 @@ import VideoPlayer, { VideoPlayerRef } from './components/VideoPlayer';
 import AROverlay from './components/AROverlay';
 import ControlPanel from './components/ControlPanel';
 import InfoPanel from './components/InfoPanel';
+import QRCodeDisplay from './components/QRCodeDisplay';
 import { videos } from './data/videos';
 import { sequences, getDetectionsAtTime, interpolateDetection, Detection } from './data/detections';
 
@@ -137,34 +138,7 @@ export default function SAM2POC() {
           <div className="mx-auto max-w-7xl px-6 lg:px-8">
             <div className="bg-black rounded-xl overflow-hidden shadow-2xl aspect-video relative">
               <div className="absolute inset-0 flex items-center justify-center">
-                <div className="text-center">
-                  <div className="bg-white rounded-2xl p-8 shadow-xl">
-                    <h3 className="text-xl font-semibold text-gray-900 mb-2">Scan to Start Camera</h3>
-                    <p className="text-sm text-gray-600 mb-6">Use your iPhone to begin live tracking</p>
-                    
-                    {/* QR Code Placeholder */}
-                    <div className="w-48 h-48 mx-auto mb-6 bg-gray-100 rounded-lg flex items-center justify-center border-2 border-gray-200">
-                      <div className="grid grid-cols-5 gap-1 p-4">
-                        {Array.from({ length: 25 }).map((_, i) => (
-                          <div
-                            key={i}
-                            className={`w-6 h-6 ${
-                              [0, 4, 6, 8, 10, 12, 14, 16, 18, 20, 24].includes(i)
-                                ? 'bg-gray-900'
-                                : [1, 3, 5, 9, 11, 13, 15, 17, 19, 21, 23].includes(i)
-                                ? 'bg-gray-700'
-                                : 'bg-gray-300'
-                            }`}
-                          />
-                        ))}
-                      </div>
-                    </div>
-                    
-                    <p className="text-xs text-gray-500">
-                      Camera feed will appear here once connected
-                    </p>
-                  </div>
-                </div>
+                <QRCodeDisplay />
               </div>
               
               {/* Live indicators */}
