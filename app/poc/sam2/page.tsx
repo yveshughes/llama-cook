@@ -14,7 +14,6 @@ import { sequences, getDetectionsAtTime, interpolateDetection, Detection } from 
 export default function SAM2POC() {
   const [mode, setMode] = useState<'demo' | 'live'>('demo');
   const [currentTime, setCurrentTime] = useState(0);
-  const [videoMetadata, setVideoMetadata] = useState({ width: 640, height: 480 });
   const [currentDetections, setCurrentDetections] = useState<Detection[]>([]);
   const [liveSessionId, setLiveSessionId] = useState<string>('');
   const [showQRCode, setShowQRCode] = useState(true);
@@ -66,8 +65,8 @@ export default function SAM2POC() {
   }, [currentVideoId]);
 
   // Handle video metadata loaded
-  const handleLoadedMetadata = useCallback((width: number, height: number) => {
-    setVideoMetadata({ width, height });
+  const handleLoadedMetadata = useCallback(() => {
+    // Metadata is loaded but we don't need to store it without AR overlays
   }, []);
 
   return (
@@ -204,7 +203,6 @@ export default function SAM2POC() {
               {/* Live Detections */}
               <InfoPanel
                 detections={currentDetections}
-                onHighlight={() => {}}
                 currentTime={currentTime}
               />
 

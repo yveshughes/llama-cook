@@ -5,11 +5,10 @@ import { motion, AnimatePresence } from 'framer-motion';
 
 interface InfoPanelProps {
   detections: Detection[];
-  onHighlight: (id: string | null) => void;
   currentTime: number;
 }
 
-export default function InfoPanel({ detections, onHighlight, currentTime }: InfoPanelProps) {
+export default function InfoPanel({ detections, currentTime }: InfoPanelProps) {
   // Group detections by label to show aggregate view
   const groupedDetections = detections.reduce((acc, detection) => {
     const key = detection.label;
