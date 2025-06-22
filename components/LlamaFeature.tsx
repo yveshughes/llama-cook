@@ -4,7 +4,16 @@ import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import TypewriterText from './TypewriterText';
 
-export default function LlamaFeature() {
+interface LlamaFeatureProps {
+  liveResponse?: {
+    question: string;
+    image: string | null;
+    response: string;
+    isProcessing: boolean;
+  };
+}
+
+export default function LlamaFeature({ liveResponse }: LlamaFeatureProps) {
   const [showResponse, setShowResponse] = useState(false);
 
   useEffect(() => {
@@ -35,6 +44,18 @@ export default function LlamaFeature() {
   return (
     <section className="py-24 sm:py-32 bg-white" id="llama">
       <div className="mx-auto max-w-7xl px-6 lg:px-8">
+        <div className="text-center mb-16">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+            viewport={{ once: true }}
+          >
+            <span className="inline-flex items-center rounded-full bg-herb-green/10 px-4 py-2 text-sm font-medium text-herb-green mb-4">
+              Step 2: Send to Llama API
+            </span>
+          </motion.div>
+        </div>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
           {/* Left side - Bullet Points */}
           <motion.div
@@ -87,71 +108,159 @@ export default function LlamaFeature() {
             </div>
           </motion.div>
           
-          {/* Right side - Llama Response Block */}
-          <motion.div 
-            className="bg-black rounded-xl shadow-lg p-6 border border-gray-800 w-full"
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3 }}
-            viewport={{ once: true }}
-          >
-            <div className="flex items-center justify-between mb-4">
-              <h4 className="font-semibold text-white">Llama-4-Scout-17B Response</h4>
-              <div className="flex items-center">
-                <div className="w-2 h-2 rounded-full animate-pulse mr-2 bg-golden"></div>
-                <span className="text-xs text-golden">
-                  {showResponse ? 'Complete' : 'Processing'}
-                </span>
+          {/* Right side - Response Block (Demo or Live) */}
+          {liveResponse ? (
+            /* Live Mode Response */
+            <motion.div
+              className="bg-gray-800 rounded-xl shadow-lg p-6 border border-golden/20"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4 }}
+            >
+              <div className="flex items-center justify-between mb-4">
+                <h4 className="font-semibold text-white">Sous Chef Live Response</h4>
+                <div className="flex items-center">
+                  <div className={`w-2 h-2 rounded-full animate-pulse mr-2 ${
+                    liveResponse.isProcessing ? 'bg-yellow-500' : 'bg-golden'
+                  }`}></div>
+                  <span className={`text-xs ${
+                    liveResponse.isProcessing ? 'text-yellow-500' : 'text-golden'
+                  }`}>
+                    {liveResponse.isProcessing ? 'Thinking...' : 'Ready'}
+                  </span>
+                </div>
               </div>
-            </div>
-            <div className="bg-gray-900 rounded-lg p-4 font-mono min-h-[120px]">
-              {!showResponse ? (
-                <motion.div
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ duration: 0.5 }}
-                  className="flex items-center justify-center h-full"
+              
+              {/* Show captured image(s) */}
+              {liveResponse.image && (
+                <motion.div 
+                  className="mb-4"
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ duration: 0.3 }}
                 >
-                  <div className="flex items-center gap-2">
-                    <div className="w-2 h-2 bg-golden rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
-                    <div className="w-2 h-2 bg-golden rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
-                    <div className="w-2 h-2 bg-golden rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
-                  </div>
+                  <p className="text-sm font-medium text-gray-400 mb-2">Captured image:</p>
+                  <img 
+                    src={liveResponse.image} 
+                    alt="Captured ingredients" 
+                    className="w-full rounded-lg border border-gray-700"
+                  />
                 </motion.div>
-              ) : (
-                <div>
+              )}
+              
+              <div className="bg-gray-900 rounded-lg p-4 font-mono">
+                {/* Question section */}
+                {liveResponse.question && (
                   <div className="mb-3 pb-3 border-b border-gray-700">
                     <p className="text-sm text-gray-400">
                       <span className="text-orange-400">&quot;</span>
-                      <span className="text-herb-green font-bold">Sous Chef</span>
-                      <span className="text-gray-400">, what can I do with these ingredients?</span>
+                      <span className="text-gray-300">{liveResponse.question}</span>
                       <span className="text-orange-400">&quot;</span>
                     </p>
                   </div>
-                  <div>
-                    <p className="text-white text-sm">
-                      <TypewriterText 
-                        text="I can see you have fresh tomatoes, mozzarella, and basil. These are perfect for a classic Caprese Salad! 🍅🧀🌿 Would you like me to guide you through the preparation? It takes just 5 minutes and requires no cooking."
-                        speed={30}
-                        className="text-white"
-                      />
-                    </p>
-                  </div>
+                )}
+                
+                {/* Response section */}
+                <div>
+                  {liveResponse.isProcessing ? (
+                    <div className="flex items-center justify-center py-8">
+                      <div className="flex items-center gap-2">
+                        <div className="w-2 h-2 bg-golden rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
+                        <div className="w-2 h-2 bg-golden rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
+                        <div className="w-2 h-2 bg-golden rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
+                      </div>
+                    </div>
+                  ) : liveResponse.response ? (
+                    <motion.p 
+                      className="text-white text-sm"
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      transition={{ duration: 0.5 }}
+                    >
+                      {liveResponse.response}
+                    </motion.p>
+                  ) : null}
                 </div>
-              )}
-            </div>
-            <div className="mt-3 flex items-center justify-between text-xs">
-              <div className="flex items-center text-gray-400">
-                <svg className="w-4 h-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                </svg>
-                {showResponse ? 'Response generated' : 'Analyzing ingredients'}
               </div>
-              <span className="text-gray-500">
-                {showResponse ? '< 100ms latency' : 'Processing...'}
-              </span>
-            </div>
-          </motion.div>
+              <div className="mt-3 flex items-center justify-between text-xs">
+                <div className="flex items-center text-gray-400">
+                  <svg className="w-4 h-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                  </svg>
+                  {liveResponse.response ? 'Response generated' : 'Analyzing ingredients'}
+                </div>
+                <span className="text-gray-500">
+                  Real-time processing
+                </span>
+              </div>
+            </motion.div>
+          ) : (
+            /* Demo Mode Response */
+            <motion.div 
+              className="bg-black rounded-xl shadow-lg p-6 border border-gray-800 w-full"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3 }}
+              viewport={{ once: true }}
+            >
+              <div className="flex items-center justify-between mb-4">
+                <h4 className="font-semibold text-white">Llama-4-Scout-17B Response</h4>
+                <div className="flex items-center">
+                  <div className="w-2 h-2 rounded-full animate-pulse mr-2 bg-golden"></div>
+                  <span className="text-xs text-golden">
+                    {showResponse ? 'Complete' : 'Processing'}
+                  </span>
+                </div>
+              </div>
+              <div className="bg-gray-900 rounded-lg p-4 font-mono min-h-[120px]">
+                {!showResponse ? (
+                  <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ duration: 0.5 }}
+                    className="flex items-center justify-center h-full"
+                  >
+                    <div className="flex items-center gap-2">
+                      <div className="w-2 h-2 bg-golden rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
+                      <div className="w-2 h-2 bg-golden rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
+                      <div className="w-2 h-2 bg-golden rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
+                    </div>
+                  </motion.div>
+                ) : (
+                  <div>
+                    <div className="mb-3 pb-3 border-b border-gray-700">
+                      <p className="text-sm text-gray-400">
+                        <span className="text-orange-400">&quot;</span>
+                        <span className="text-herb-green font-bold">Sous Chef</span>
+                        <span className="text-gray-400">, what can I do with these ingredients?</span>
+                        <span className="text-orange-400">&quot;</span>
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-white text-sm">
+                        <TypewriterText 
+                          text="I can see you have fresh tomatoes, mozzarella, and basil. These are perfect for a classic Caprese Salad! 🍅🧀🌿 Would you like me to guide you through the preparation? It takes just 5 minutes and requires no cooking."
+                          speed={30}
+                          className="text-white"
+                        />
+                      </p>
+                    </div>
+                  </div>
+                )}
+              </div>
+              <div className="mt-3 flex items-center justify-between text-xs">
+                <div className="flex items-center text-gray-400">
+                  <svg className="w-4 h-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                  </svg>
+                  {showResponse ? 'Response generated' : 'Analyzing ingredients'}
+                </div>
+                <span className="text-gray-500">
+                  {showResponse ? '< 100ms latency' : 'Processing...'}
+                </span>
+              </div>
+            </motion.div>
+          )}
         </div>
       </div>
     </section>

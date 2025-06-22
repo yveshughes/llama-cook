@@ -1,3 +1,6 @@
+'use client';
+
+import { useState } from 'react';
 import Navigation from '@/components/Navigation';
 import TechStackBanner from '@/components/TechStackBanner';
 import HeroSection from '@/components/HeroSection';
@@ -10,6 +13,21 @@ import SetupInstructions from '@/components/SetupInstructions';
 import { LiveModeProvider } from '@/contexts/LiveModeContext';
 
 export default function Home() {
+  const [llamaLiveResponse, setLlamaLiveResponse] = useState<{
+    question: string;
+    image: string | null;
+    response: string;
+    isProcessing: boolean;
+  } | undefined>();
+
+  const handleLlamaResponse = (data: {
+    question: string;
+    image: string | null;
+    response: string;
+    isProcessing: boolean;
+  }) => {
+    setLlamaLiveResponse(data);
+  };
   return (
     <LiveModeProvider>
       <div className="min-h-screen bg-gradient-to-b from-cream to-mozzarella">
@@ -23,12 +41,12 @@ export default function Home() {
       
       {/* 1. Voice Command - Entry point */}
       <div id="voice">
-        <VoiceFeature />
+        <VoiceFeature onLlamaResponse={handleLlamaResponse} />
       </div>
       
       {/* 2. Llama 4 - Understanding ingredients */}
       <div id="llama">
-        <LlamaFeature />
+        <LlamaFeature liveResponse={llamaLiveResponse} />
       </div>
       
       {/* 3. SAM2 - Watching ingredients and state */}

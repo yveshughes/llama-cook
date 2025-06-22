@@ -8,14 +8,30 @@ import { TranscribeClient, TranscriptSegment } from '@/services/aws-transcribe-c
 import DualModeQRDisplay from '@/components/DualModeQRDisplay';
 import CameraStreamViewer from '@/components/CameraStreamViewer';
 
-export default function VoiceFeature() {
+interface VoiceFeatureProps {
+  onLlamaResponse?: (data: {
+    question: string;
+    image: string | null;
+    response: string;
+    isProcessing: boolean;
+  }) => void;
+}
+
+export default function VoiceFeature({ onLlamaResponse }: VoiceFeatureProps) {
   const { isLiveMode } = useLiveMode();
   const [isListening, setIsListening] = useState(false);
   const [transcripts, setTranscripts] = useState<TranscriptSegment[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [transcribeClient] = useState(() => new TranscribeClient());
   const transcriptContainerRef = useRef<HTMLDivElement>(null);
-  const [cameraView, setCameraView] = useState<'connect' | 'stream'>('connect');
+  const [cameraView, setCameraView] = useState<'connect' | 'stream'>('stream');
+  const [llamaResponse, setLlamaResponse] = useState<string | null>(null);
+  const [isProcessingQuestion, setIsProcessingQuestion] = useState(false);
+  const [commandBuffer, setCommandBuffer] = useState<string>('');
+  const [showFlash, setShowFlash] = useState(false);
+  const commandTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const [lastQuestion, setLastQuestion] = useState<string>('');
+  const [capturedImage, setCapturedImage] = useState<string | null>(null);
 
   // Start transcription when in live mode
   useEffect(() => {
@@ -32,6 +48,9 @@ export default function VoiceFeature() {
     return () => {
       if (isListening) {
         transcribeClient.stopTranscription();
+      }
+      if (commandTimeoutRef.current) {
+        clearTimeout(commandTimeoutRef.current);
       }
     };
   }, [isListening, transcribeClient]);
@@ -51,9 +70,10 @@ export default function VoiceFeature() {
       setError(null);
       setIsListening(true);
       setTranscripts([]);
+      setCommandBuffer('');
       
       await transcribeClient.startTranscription(
-        (segment) => {
+        async (segment) => {
           setTranscripts(prev => {
             // If this is a final result, remove any partial results with the same base ID
             if (segment.isFinal && segment.resultId) {
@@ -76,10 +96,51 @@ export default function VoiceFeature() {
             }
             return [...prev, segment];
           });
+          
+          // Handle command mode text
+          if (segment.isCommand) {
+            const text = segment.text.trim();
+            
+            // Skip if it's just the wake word itself
+            if (text.toLowerCase() === 'sous chef' || text === '') {
+              return;
+            }
+            
+            // Clear any existing timeout
+            if (commandTimeoutRef.current) {
+              clearTimeout(commandTimeoutRef.current);
+            }
+            
+            // Only accumulate text that comes after the wake word
+            // and only if it's a final segment (to avoid duplicates)
+            if (segment.isFinal) {
+              setCommandBuffer(prev => {
+                // If buffer is empty, this is the first command text
+                const newBuffer = prev ? prev + ' ' + text : text;
+                return newBuffer;
+              });
+              
+              // Set a new timeout to process after pause (1.5 seconds of silence)
+              commandTimeoutRef.current = setTimeout(() => {
+                setCommandBuffer(currentBuffer => {
+                  const trimmedBuffer = currentBuffer.trim();
+                  if (trimmedBuffer.length > 3) { // Only process if we have meaningful text
+                    processQuestion(trimmedBuffer);
+                  }
+                  return ''; // Clear buffer after processing
+                });
+              }, 1500); // Wait 1.5 seconds of silence before processing
+            }
+          }
         },
         (error) => {
           console.error('Transcription error:', error);
-          setError(error.message);
+          // Don't show technical AWS errors to users
+          if (error.message.includes('BadRequestException')) {
+            console.log('AWS Transcribe session issue - this is normal when switching modes');
+          } else {
+            setError('Voice recognition temporarily unavailable');
+          }
           setIsListening(false);
         }
       );
@@ -94,8 +155,104 @@ export default function VoiceFeature() {
     try {
       await transcribeClient.stopTranscription();
       setIsListening(false);
+      // Clear any pending command processing
+      if (commandTimeoutRef.current) {
+        clearTimeout(commandTimeoutRef.current);
+        commandTimeoutRef.current = null;
+      }
+      setCommandBuffer('');
     } catch (err) {
       console.error('Error stopping transcription:', err);
+    }
+  };
+
+  const processQuestion = async (question: string) => {
+    console.log('Processing question:', question);
+    setIsProcessingQuestion(true);
+    setLlamaResponse(null);
+    setLastQuestion(question);
+    setCommandBuffer(''); // Clear buffer immediately to prevent re-processing
+    
+    // Notify that processing is starting (use setTimeout to avoid render-time state update)
+    if (isLiveMode && onLlamaResponse) {
+      setTimeout(() => {
+        onLlamaResponse({
+          question,
+          image: null,
+          response: '',
+          isProcessing: true
+        });
+      }, 0);
+    }
+    
+    try {
+      // Switch to stream view to ensure we have the latest frame
+      setCameraView('stream');
+      
+      // Small delay to ensure stream view is loaded
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
+      // Capture the current frame before processing
+      let currentCapturedImage: string | null = null;
+      const frameResponse = await fetch(`/api/camera-stream?roomId=demo-room-001`);
+      if (frameResponse.ok) {
+        const frameData = await frameResponse.json();
+        if (frameData.frame) {
+          currentCapturedImage = frameData.frame;
+          setCapturedImage(frameData.frame);
+        }
+      }
+      
+      // Trigger camera flash effect
+      setShowFlash(true);
+      setTimeout(() => setShowFlash(false), 300); // Flash duration
+      
+      // Play camera shutter sound if available
+      const audio = new Audio('/sounds/camera-shutter.mp3');
+      audio.play().catch(() => {}); // Ignore if sound file doesn't exist
+      
+      // Send question to API
+      const response = await fetch('/api/process-question', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          question,
+          roomId: 'demo-room-001'
+        }),
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to process question');
+      }
+      
+      const data = await response.json();
+      setLlamaResponse(data.answer);
+      
+      // Log debug info if available
+      if (data.debug) {
+        console.log('API Debug info:', data.debug);
+      }
+      
+      // Call the callback if in live mode (use setTimeout to avoid render-time state update)
+      if (isLiveMode && onLlamaResponse) {
+        setTimeout(() => {
+          onLlamaResponse({
+            question,
+            image: currentCapturedImage,
+            response: data.answer,
+            isProcessing: false
+          });
+        }, 0);
+      }
+      
+    } catch (err) {
+      console.error('Error processing question:', err);
+      // Don't show error to user - they can just try again
+      setLlamaResponse('I couldn\'t process that. Please try asking again.');
+    } finally {
+      setIsProcessingQuestion(false);
     }
   };
 
@@ -222,8 +379,21 @@ export default function VoiceFeature() {
                     </svg>
                     {!isLiveMode ? 'Wake word detected' : 'Real-time transcription'}
                   </div>
-                  {isLiveMode && (
+                  {isLiveMode && !commandBuffer && (
                     <span className="text-gray-500">Say &quot;Sous Chef&quot; to activate</span>
+                  )}
+                  {isLiveMode && commandBuffer && (
+                    <motion.span 
+                      className="text-herb-green font-medium flex items-center gap-1"
+                      initial={{ scale: 0.8, opacity: 0 }}
+                      animate={{ scale: 1, opacity: 1 }}
+                      transition={{ duration: 0.2 }}
+                    >
+                      <svg className="w-4 h-4 animate-pulse" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-3a1 1 0 00-.867.5 1 1 0 11-1.731-1A3 3 0 0113 8a3.001 3.001 0 01-2 2.83V11a1 1 0 11-2 0v-1a1 1 0 011-1 1 1 0 100-2zm0 8a1 1 0 100-2 1 1 0 000 2z" clipRule="evenodd" />
+                      </svg>
+                      Listening for command...
+                    </motion.span>
                   )}
                 </div>
                 {/* Error Display */}
@@ -303,14 +473,97 @@ export default function VoiceFeature() {
                       }}
                     />
                   ) : (
-                    <CameraStreamViewer
-                      roomId="demo-room-001"
-                      mode="websocket"
-                      className="aspect-video rounded-lg bg-black"
-                    />
+                    <div className="relative">
+                      <CameraStreamViewer
+                        roomId="demo-room-001"
+                        mode="websocket"
+                        className="aspect-video rounded-lg bg-black"
+                      />
+                      
+                      {/* Camera Flash Effect */}
+                      {showFlash && (
+                        <motion.div 
+                          className="absolute inset-0 bg-white rounded-lg pointer-events-none"
+                          initial={{ opacity: 0 }}
+                          animate={{ opacity: [0, 0.9, 0] }}
+                          transition={{ duration: 0.3, ease: "easeOut" }}
+                        />
+                      )}
+                      
+                      {/* Camera Icon Animation */}
+                      {showFlash && (
+                        <motion.div 
+                          className="absolute top-4 right-4 bg-white rounded-full p-3 shadow-lg"
+                          initial={{ scale: 0, opacity: 0 }}
+                          animate={{ 
+                            scale: [0, 1.2, 1],
+                            opacity: [0, 1, 0]
+                          }}
+                          transition={{ duration: 0.5 }}
+                        >
+                          <svg className="w-6 h-6 text-gray-800" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+                          </svg>
+                        </motion.div>
+                      )}
+                    </div>
                   )
                 )}
               </motion.div>
+              
+              {/* Llama Response Block - Only show in demo mode */}
+              {!isLiveMode && (isProcessingQuestion || llamaResponse) && (
+                <motion.div 
+                  className="bg-white rounded-xl shadow-lg p-6 border border-herb-green/20 mt-4"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.4 }}
+                >
+                  <div className="flex items-center justify-between mb-4">
+                    <h4 className="font-semibold text-gray-900">Sous Chef Response</h4>
+                    <div className="flex items-center">
+                      <div className={`w-2 h-2 rounded-full animate-pulse mr-2 ${
+                        isProcessingQuestion ? 'bg-yellow-500' : 'bg-herb-green'
+                      }`}></div>
+                      <span className={`text-xs ${
+                        isProcessingQuestion ? 'text-yellow-600' : 'text-herb-green'
+                      }`}>
+                        {isProcessingQuestion ? 'Thinking...' : 'Ready'}
+                      </span>
+                    </div>
+                  </div>
+                  
+                  {/* Show question and captured image in Live mode */}
+                  {isLiveMode && lastQuestion && (
+                    <div className="mb-4 p-4 bg-gray-50 rounded-lg">
+                      <p className="text-sm font-medium text-gray-700 mb-2">Your question:</p>
+                      <p className="text-sm text-gray-600 italic">&ldquo;{lastQuestion}&rdquo;</p>
+                      
+                      {capturedImage && (
+                        <div className="mt-3">
+                          <p className="text-sm font-medium text-gray-700 mb-2">Captured image:</p>
+                          <img 
+                            src={capturedImage} 
+                            alt="Captured ingredients" 
+                            className="w-32 h-24 object-cover rounded border border-gray-300"
+                          />
+                        </div>
+                      )}
+                    </div>
+                  )}
+                  
+                  {isProcessingQuestion ? (
+                    <div className="flex items-center justify-center py-8">
+                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-herb-green"></div>
+                    </div>
+                  ) : llamaResponse ? (
+                    <div className="prose prose-sm max-w-none">
+                      <p className="text-gray-700 leading-relaxed">{llamaResponse}</p>
+                    </div>
+                  ) : null}
+                </motion.div>
+              )}
             </div>
             
             {/* Visual elements */}
