@@ -5,6 +5,8 @@ export interface VideoConfig {
   src: string;
   poster?: string;
   duration: number;
+  width?: number;
+  height?: number;
 }
 
 export const videos: VideoConfig[] = [
@@ -15,6 +17,8 @@ export const videos: VideoConfig[] = [
     src: '/caprese-placeholder.mp4',
     poster: '/caprese-placeholder-poster.jpg',
     duration: 12000, // 12 seconds
+    width: 816,  // Actual video dimensions from the screenshot
+    height: 459,
   },
 ];
 

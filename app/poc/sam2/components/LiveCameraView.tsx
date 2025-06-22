@@ -38,9 +38,9 @@ export default function LiveCameraView({ sessionId, serverUrl }: LiveCameraViewP
       }
     };
 
-    // Start polling
+    // Start polling with longer interval to reduce load
     checkForUpdates();
-    intervalRef.current = setInterval(checkForUpdates, 1000);
+    intervalRef.current = setInterval(checkForUpdates, 3000); // Poll every 3 seconds instead of 1
 
     return () => {
       if (intervalRef.current) {

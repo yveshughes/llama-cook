@@ -28,195 +28,79 @@ const colors = {
   oil: '#FFB300',
   pepper: '#424242',
   garlic: '#FFF9C4',
+  balsamic: '#4A2C2A',
 };
 
-// Classic Caprese Salad sequence - the star of our demo
+// Classic Caprese Salad sequence - matched to actual video
 export const capreseSequence: DetectionSequence = {
   videoId: 'caprese-salad',
   duration: 12000, // 12 seconds
   detections: [
-    // Initial ingredients on cutting board
+    // Initial scene - all ingredients visible on cutting board
     {
-      id: 'tomato-1',
-      label: 'Fresh Tomato',
-      confidence: 0.98,
-      bbox: [80, 180, 120, 120],
+      id: 'salt-grinder',
+      label: 'Sea Salt Grinder',
+      confidence: 0.89,
+      bbox: [20, 100, 60, 120],
       timestamp: 0,
-      color: colors.tomato,
-      state: 'whole',
-    },
-    {
-      id: 'tomato-2',
-      label: 'Fresh Tomato',
-      confidence: 0.97,
-      bbox: [220, 170, 120, 120],
-      timestamp: 200,
-      color: colors.tomato,
-      state: 'whole',
-    },
-    {
-      id: 'mozzarella-ball',
-      label: 'Fresh Mozzarella',
-      confidence: 0.96,
-      bbox: [380, 175, 130, 130],
-      timestamp: 400,
-      color: colors.mozzarella,
-      state: 'whole',
-    },
-    {
-      id: 'basil-bunch',
-      label: 'Fresh Basil',
-      confidence: 0.95,
-      bbox: [520, 190, 100, 80],
-      timestamp: 600,
-      color: colors.basil,
-      state: 'whole',
-    },
-    
-    // Slicing phase - tomatoes
-    {
-      id: 'tomato-slice-1',
-      label: 'Tomato Slice',
-      confidence: 0.94,
-      bbox: [100, 300, 80, 20],
-      timestamp: 2000,
-      color: colors.tomato,
-      state: 'chopped',
-    },
-    {
-      id: 'tomato-slice-2',
-      label: 'Tomato Slice',
-      confidence: 0.94,
-      bbox: [190, 300, 80, 20],
-      timestamp: 2200,
-      color: colors.tomato,
-      state: 'chopped',
-    },
-    {
-      id: 'tomato-slice-3',
-      label: 'Tomato Slice',
-      confidence: 0.93,
-      bbox: [280, 300, 80, 20],
-      timestamp: 2400,
-      color: colors.tomato,
-      state: 'chopped',
-    },
-    
-    // Slicing phase - mozzarella
-    {
-      id: 'mozzarella-slice-1',
-      label: 'Mozzarella Slice',
-      confidence: 0.95,
-      bbox: [370, 300, 90, 25],
-      timestamp: 3000,
-      color: colors.mozzarella,
-      state: 'chopped',
-    },
-    {
-      id: 'mozzarella-slice-2',
-      label: 'Mozzarella Slice',
-      confidence: 0.95,
-      bbox: [470, 300, 90, 25],
-      timestamp: 3200,
-      color: colors.mozzarella,
-      state: 'chopped',
-    },
-    
-    // Plating phase - alternating arrangement
-    {
-      id: 'plated-tomato-1',
-      label: 'Tomato',
-      confidence: 0.96,
-      bbox: [200, 200, 80, 80],
-      timestamp: 5000,
-      color: colors.tomato,
-      state: 'chopped',
-    },
-    {
-      id: 'plated-mozzarella-1',
-      label: 'Mozzarella',
-      confidence: 0.96,
-      bbox: [290, 200, 80, 80],
-      timestamp: 5200,
-      color: colors.mozzarella,
-      state: 'chopped',
-    },
-    {
-      id: 'plated-tomato-2',
-      label: 'Tomato',
-      confidence: 0.95,
-      bbox: [380, 200, 80, 80],
-      timestamp: 5400,
-      color: colors.tomato,
-      state: 'chopped',
-    },
-    {
-      id: 'plated-basil-1',
-      label: 'Basil Leaf',
-      confidence: 0.94,
-      bbox: [245, 190, 40, 30],
-      timestamp: 5600,
-      color: colors.basil,
-      state: 'whole',
-    },
-    {
-      id: 'plated-basil-2',
-      label: 'Basil Leaf',
-      confidence: 0.94,
-      bbox: [335, 190, 40, 30],
-      timestamp: 5800,
-      color: colors.basil,
-      state: 'whole',
-    },
-    
-    // Finishing touches
-    {
-      id: 'oil-drizzle',
-      label: 'Extra Virgin Olive Oil',
-      confidence: 0.92,
-      bbox: [200, 180, 260, 120],
-      timestamp: 7000,
-      color: colors.oil,
-      state: 'mixed',
-    },
-    {
-      id: 'salt-sprinkle',
-      label: 'Sea Salt',
-      confidence: 0.90,
-      bbox: [240, 200, 180, 80],
-      timestamp: 8000,
       color: colors.salt,
       state: 'whole',
     },
     {
-      id: 'pepper-grind',
-      label: 'Black Pepper',
-      confidence: 0.89,
-      bbox: [280, 210, 140, 70],
-      timestamp: 8500,
+      id: 'pepper-mill',
+      label: 'Black Pepper Mill',
+      confidence: 0.87,
+      bbox: [90, 100, 60, 120],
+      timestamp: 50,
       color: colors.pepper,
       state: 'whole',
     },
     {
-      id: 'balsamic-drizzle',
-      label: 'Balsamic Glaze',
+      id: 'tomatoes-vine',
+      label: 'Tomatoes on Vine',
+      confidence: 0.98,
+      bbox: [180, 140, 160, 120],
+      timestamp: 100,
+      color: colors.tomato,
+      state: 'whole',
+    },
+    {
+      id: 'basil-fresh',
+      label: 'Fresh Basil',
+      confidence: 0.95,
+      bbox: [240, 240, 120, 80],
+      timestamp: 150,
+      color: colors.basil,
+      state: 'whole',
+    },
+    {
+      id: 'mozzarella-fresh',
+      label: 'Fresh Mozzarella',
+      confidence: 0.96,
+      bbox: [350, 180, 100, 80],
+      timestamp: 200,
+      color: colors.mozzarella,
+      state: 'whole',
+    },
+    {
+      id: 'olive-oil-bottle',
+      label: 'Extra Virgin Olive Oil',
+      confidence: 0.93,
+      bbox: [420, 80, 80, 160],
+      timestamp: 250,
+      color: colors.oil,
+      state: 'whole',
+    },
+    {
+      id: 'balsamic-vinegar',
+      label: 'Balsamic Vinegar',
       confidence: 0.91,
-      bbox: [220, 190, 220, 100],
-      timestamp: 9000,
-      color: '#4A2C2A',
-      state: 'mixed',
+      bbox: [500, 100, 70, 140],
+      timestamp: 300,
+      color: colors.balsamic,
+      state: 'whole',
     },
     
-    // Final dish recognition
-    {
-      id: 'complete-caprese',
-      label: 'Caprese Salad',
-      confidence: 0.98,
-      bbox: [180, 160, 320, 160],
-      timestamp: 10000,
-      color: colors.basil,
-      state: 'mixed',
-    },
   ],
 };
 
@@ -226,12 +110,32 @@ export const sequences = {
 
 // Helper function to get detections at a specific timestamp
 export function getDetectionsAtTime(sequence: DetectionSequence, currentTime: number): Detection[] {
-  return sequence.detections.filter(detection => {
-    // Show detections within a 2-second window
-    const windowStart = detection.timestamp;
-    const windowEnd = detection.timestamp + 2000;
-    return currentTime >= windowStart && currentTime <= windowEnd;
+  // Get all detections that should be visible at current time
+  const visibleDetections = sequence.detections.filter(detection => {
+    return currentTime >= detection.timestamp;
   });
+  
+  // Create a map to handle detection lifecycle (some detections replace others)
+  const detectionMap = new Map<string, Detection>();
+  
+  // No transformations needed since we're only showing whole ingredients
+  const transformRules = new Map([]);
+  
+  // Add all visible detections to the map
+  for (const detection of visibleDetections) {
+    detectionMap.set(detection.id, detection);
+  }
+  
+  // Apply transformation rules - remove replaced detections
+  for (const [newId, oldIds] of transformRules) {
+    if (detectionMap.has(newId)) {
+      for (const oldId of oldIds) {
+        detectionMap.delete(oldId);
+      }
+    }
+  }
+  
+  return Array.from(detectionMap.values());
 }
 
 // Helper to interpolate position between detections

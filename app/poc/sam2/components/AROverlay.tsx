@@ -92,7 +92,7 @@ export default function AROverlay({
     });
   }, [detections, isEnabled]);
 
-  // Animation loop
+  // Animation loop with performance optimization
   useEffect(() => {
     if (!canvasRef.current || !isEnabled || canvasSize.width === 0) return;
 
@@ -100,10 +100,27 @@ export default function AROverlay({
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    const animate = () => {
-      clearCanvas(ctx);
+    let lastFrameTime = 0;
+    const targetFPS = 30; // Limit to 30 FPS to reduce CPU usage
+    const frameInterval = 1000 / targetFPS;
 
+    const animate = (currentTime: number) => {
+      // Throttle animation to target FPS
+      if (currentTime - lastFrameTime < frameInterval) {
+        animationFrameRef.current = requestAnimationFrame(animate);
+        return;
+      }
+      lastFrameTime = currentTime;
+
+      // Skip if no detections to render
       const animatedDetections = Array.from(animatedDetectionsRef.current.values());
+      if (animatedDetections.length === 0) {
+        clearCanvas(ctx);
+        animationFrameRef.current = requestAnimationFrame(animate);
+        return;
+      }
+
+      clearCanvas(ctx);
       
       // Draw in layers for better visual hierarchy
       // Layer 1: Pulse effects for new detections
@@ -152,11 +169,12 @@ export default function AROverlay({
       animationFrameRef.current = requestAnimationFrame(animate);
     };
 
-    animate();
+    animationFrameRef.current = requestAnimationFrame(animate);
 
     return () => {
       if (animationFrameRef.current) {
         cancelAnimationFrame(animationFrameRef.current);
+        animationFrameRef.current = undefined;
       }
     };
   }, [isEnabled, highlightedId, videoWidth, videoHeight, canvasSize]);

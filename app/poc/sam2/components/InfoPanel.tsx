@@ -50,7 +50,7 @@ export default function InfoPanel({ detections, onHighlight, currentTime }: Info
       </div>
 
       {/* Detection List */}
-      <div className="max-h-96 overflow-y-auto">
+      <div>
         <AnimatePresence mode="popLayout">
           {detectionGroups.length === 0 ? (
             <div className="px-4 py-8 text-center text-sm text-gray-500">
@@ -65,21 +65,19 @@ export default function InfoPanel({ detections, onHighlight, currentTime }: Info
                   animate={{ opacity: 1, x: 0 }}
                   exit={{ opacity: 0, x: 20 }}
                   transition={{ duration: 0.2 }}
-                  className="px-4 py-3 hover:bg-gray-50 transition-colors cursor-pointer"
-                  onMouseEnter={() => onHighlight(group.ids[0])}
-                  onMouseLeave={() => onHighlight(null)}
+                  className="px-3 py-2 hover:bg-gray-50 transition-colors text-sm"
                 >
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
                       {/* Color indicator */}
                       <div
-                        className="w-3 h-3 rounded-full ring-2 ring-offset-1 ring-gray-200"
+                        className="w-2 h-2 rounded-full ring-1 ring-offset-1 ring-gray-200"
                         style={{ backgroundColor: group.color }}
                       />
                       
                       {/* Label and state */}
                       <div>
-                        <p className="text-sm font-medium text-gray-900">
+                        <p className="text-xs font-medium text-gray-900">
                           {group.label}
                           {group.count > 1 && (
                             <span className="ml-1 text-xs text-gray-500">
@@ -87,20 +85,21 @@ export default function InfoPanel({ detections, onHighlight, currentTime }: Info
                             </span>
                           )}
                         </p>
-                        {group.state !== 'whole' && (
-                          <p className="text-xs text-gray-500 capitalize">
-                            {group.state}
-                          </p>
-                        )}
                       </div>
                     </div>
 
-                    {/* Confidence */}
-                    <div className="text-right">
-                      <p className="text-xs font-medium text-gray-900">
-                        {Math.round(group.confidence * 100)}%
-                      </p>
-                      <p className="text-xs text-gray-500">confidence</p>
+                    {/* Confidence & State */}
+                    <div className="flex items-center gap-4">
+                      {group.state !== 'whole' && (
+                        <span className="text-xs text-gray-500 capitalize">
+                          {group.state}
+                        </span>
+                      )}
+                      <div className="text-right">
+                        <p className="text-xs font-medium text-gray-900">
+                          {Math.round(group.confidence * 100)}%
+                        </p>
+                      </div>
                     </div>
                   </div>
                 </motion.div>

@@ -22,6 +22,7 @@ const VideoPlayer = forwardRef<VideoPlayerRef, VideoPlayerProps>(
   ({ video, onTimeUpdate, onLoadedMetadata, className = '' }, ref) => {
     const videoRef = useRef<HTMLVideoElement>(null);
     const [isPlaying, setIsPlaying] = useState(false);
+    const [hasEnded, setHasEnded] = useState(false);
 
     useImperativeHandle(ref, () => ({
       play: async () => {
@@ -69,11 +70,16 @@ const VideoPlayer = forwardRef<VideoPlayerRef, VideoPlayerProps>(
 
       const handlePlay = () => setIsPlaying(true);
       const handlePause = () => setIsPlaying(false);
+      const handleEnded = () => {
+        setIsPlaying(false);
+        setHasEnded(true);
+      };
 
       videoElement.addEventListener('timeupdate', handleTimeUpdate);
       videoElement.addEventListener('loadedmetadata', handleLoadedMetadata);
       videoElement.addEventListener('play', handlePlay);
       videoElement.addEventListener('pause', handlePause);
+      videoElement.addEventListener('ended', handleEnded);
 
       // Auto-play the video when component mounts
       videoElement.play().catch(console.error);
@@ -83,6 +89,7 @@ const VideoPlayer = forwardRef<VideoPlayerRef, VideoPlayerProps>(
         videoElement.removeEventListener('loadedmetadata', handleLoadedMetadata);
         videoElement.removeEventListener('play', handlePlay);
         videoElement.removeEventListener('pause', handlePause);
+        videoElement.removeEventListener('ended', handleEnded);
       };
     }, [onTimeUpdate, onLoadedMetadata]);
 
@@ -96,6 +103,14 @@ const VideoPlayer = forwardRef<VideoPlayerRef, VideoPlayerProps>(
       }
     };
 
+    const resetVideo = () => {
+      if (videoRef.current) {
+        videoRef.current.currentTime = 0;
+        setHasEnded(false);
+        videoRef.current.play();
+      }
+    };
+
     return (
       <div className={`relative bg-black rounded-xl overflow-hidden ${className}`}>
         <video
@@ -104,9 +119,34 @@ const VideoPlayer = forwardRef<VideoPlayerRef, VideoPlayerProps>(
           src={video.src}
           playsInline
           muted
-          loop
           autoPlay
         />
+        
+        {/* End screen with reset button */}
+        {hasEnded && (
+          <div className="absolute inset-0 bg-black/75 flex items-center justify-center">
+            <div className="text-center">
+              <div className="mb-4">
+                <svg className="w-16 h-16 mx-auto text-white/80" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} 
+                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
+              <h3 className="text-xl font-semibold text-white mb-2">Demo Complete</h3>
+              <p className="text-sm text-white/70 mb-4">All ingredients detected and tracked</p>
+              <button
+                onClick={resetVideo}
+                className="inline-flex items-center gap-2 px-6 py-3 bg-herb-green text-white rounded-lg hover:bg-herb-green/90 transition-colors font-medium"
+              >
+                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} 
+                    d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                </svg>
+                Watch Again
+              </button>
+            </div>
+          </div>
+        )}
         
         {/* Video controls overlay */}
         <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-4 opacity-0 hover:opacity-100 transition-opacity duration-300">
