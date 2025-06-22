@@ -2,10 +2,128 @@
 
 import { motion } from 'framer-motion';
 import Link from 'next/link';
+import { useState, useEffect, useRef } from 'react';
 import { useLiveMode } from '@/contexts/LiveModeContext';
+import { TranscribeClient, TranscriptSegment } from '@/services/aws-transcribe-client';
 
 export default function VoiceFeature() {
   const { isLiveMode } = useLiveMode();
+  const [isListening, setIsListening] = useState(false);
+  const [transcripts, setTranscripts] = useState<TranscriptSegment[]>([]);
+  const [error, setError] = useState<string | null>(null);
+  const [transcribeClient] = useState(() => new TranscribeClient());
+  const transcriptContainerRef = useRef<HTMLDivElement>(null);
+
+  // Start transcription when in live mode
+  useEffect(() => {
+    if (isLiveMode && !isListening) {
+      startListening();
+    } else if (!isLiveMode && isListening) {
+      stopListening();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isLiveMode]);
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      if (isListening) {
+        transcribeClient.stopTranscription();
+      }
+    };
+  }, [isListening, transcribeClient]);
+
+  // Auto-scroll to bottom when new transcripts are added with smooth behavior
+  useEffect(() => {
+    if (transcriptContainerRef.current) {
+      transcriptContainerRef.current.scrollTo({
+        top: transcriptContainerRef.current.scrollHeight,
+        behavior: 'smooth'
+      });
+    }
+  }, [transcripts]);
+
+  const startListening = async () => {
+    try {
+      setError(null);
+      setIsListening(true);
+      setTranscripts([]);
+      
+      await transcribeClient.startTranscription(
+        (segment) => {
+          setTranscripts(prev => {
+            // If this is a final result, remove any partial results with the same base ID
+            if (segment.isFinal && segment.resultId) {
+              const baseId = segment.resultId.split('-')[0];
+              const filtered = prev.filter(s => {
+                if (!s.resultId) return true;
+                const sBaseId = s.resultId.split('-')[0];
+                return sBaseId !== baseId || s.isFinal;
+              });
+              return [...filtered, segment];
+            }
+            // For partial results, update existing partial with same ID or add new
+            else if (!segment.isFinal && segment.resultId) {
+              const existingIndex = prev.findIndex(s => s.resultId === segment.resultId);
+              if (existingIndex >= 0) {
+                const updated = [...prev];
+                updated[existingIndex] = segment;
+                return updated;
+              }
+            }
+            return [...prev, segment];
+          });
+        },
+        (error) => {
+          console.error('Transcription error:', error);
+          setError(error.message);
+          setIsListening(false);
+        }
+      );
+    } catch (err) {
+      console.error('Error starting transcription:', err);
+      setError(err instanceof Error ? err.message : 'Failed to start transcription');
+      setIsListening(false);
+    }
+  };
+
+  const stopListening = async () => {
+    try {
+      await transcribeClient.stopTranscription();
+      setIsListening(false);
+    } catch (err) {
+      console.error('Error stopping transcription:', err);
+    }
+  };
+
+  // Format transcripts for display
+  const formatTranscriptText = (segments: TranscriptSegment[]) => {
+    return segments.map((segment, index) => {
+      const words = segment.text.split(' ');
+      return (
+        <span key={index}>
+          {words.map((word, wordIndex) => {
+            const isWakeWord = word.toLowerCase().includes('sous') || 
+                             (words[wordIndex + 1] && words[wordIndex + 1].toLowerCase().includes('chef'));
+            return (
+              <span
+                key={`${index}-${wordIndex}`}
+                className={
+                  isWakeWord 
+                    ? 'text-herb-green font-bold' 
+                    : segment.isCommand 
+                    ? 'text-orange-400' 
+                    : 'text-white'
+                }
+              >
+                {word}{' '}
+              </span>
+            );
+          })}
+        </span>
+      );
+    });
+  };
 
   return (
     <section className="py-24 sm:py-32 bg-gradient-to-br from-cream to-white">
@@ -51,16 +169,20 @@ export default function VoiceFeature() {
                   <h4 className="font-semibold text-white">AWS Transcription</h4>
                   <div className="flex items-center">
                     <div className={`w-2 h-2 rounded-full animate-pulse mr-2 ${
-                      isLiveMode ? 'bg-red-500' : 'bg-herb-green'
+                      isLiveMode && isListening ? 'bg-red-500' : 'bg-herb-green'
                     }`}></div>
                     <span className={`text-xs ${
-                      isLiveMode ? 'text-red-500' : 'text-herb-green'
+                      isLiveMode && isListening ? 'text-red-500' : 'text-herb-green'
                     }`}>
-                      {isLiveMode ? 'Live' : 'Listening'}
+                      {isLiveMode ? (isListening ? 'Live' : 'Ready') : 'Demo'}
                     </span>
                   </div>
                 </div>
-                <div className="bg-gray-900 rounded-lg p-4 font-mono min-h-[60px]">
+                <div 
+                  ref={transcriptContainerRef}
+                  className="bg-gray-900 rounded-lg p-4 font-mono min-h-[60px] max-h-[120px] overflow-y-auto scroll-smooth"
+                  style={{ scrollBehavior: 'smooth' }}
+                >
                   {!isLiveMode ? (
                     <div className="w-full">
                       <motion.div
@@ -78,9 +200,15 @@ export default function VoiceFeature() {
                     </div>
                   ) : (
                     <div className="w-full">
-                      <p className="text-sm text-gray-500">
-                        <span className="inline-block animate-pulse">Listening for &quot;Sous Chef&quot;...</span>
-                      </p>
+                      {transcripts.length === 0 ? (
+                        <p className="text-sm text-gray-500">
+                          <span className="inline-block animate-pulse">Listening for speech...</span>
+                        </p>
+                      ) : (
+                        <p className="text-sm leading-relaxed">
+                          {formatTranscriptText(transcripts)}
+                        </p>
+                      )}
                     </div>
                   )}
                 </div>
@@ -95,6 +223,12 @@ export default function VoiceFeature() {
                     <span className="text-gray-500">Say &quot;Sous Chef&quot; to activate</span>
                   )}
                 </div>
+                {/* Error Display */}
+                {error && isLiveMode && (
+                  <div className="mt-2 p-2 bg-red-900/20 border border-red-500/30 rounded text-xs text-red-400">
+                    {error}
+                  </div>
+                )}
               </motion.div>
               
               {/* Video Stream Block */}

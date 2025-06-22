@@ -9,7 +9,9 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@aws-sdk/client-transcribe-streaming": "^3.830.0",
     "@types/qrcode": "^1.5.5",
+    "aws-sdk-client-mock": "^4.1.0",
     "framer-motion": "^12.18.1",
     "next": "15.3.4",
     "qrcode": "^1.5.4",
