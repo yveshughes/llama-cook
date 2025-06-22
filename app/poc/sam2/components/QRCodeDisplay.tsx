@@ -20,9 +20,12 @@ export default function QRCodeDisplay({ className = '', onSessionCreated }: QRCo
         // Get the SAM2 server URL from environment or use default
         const sam2ServerUrl = process.env.NEXT_PUBLIC_SAM2_SERVER_URL || 'http://localhost:5000';
         
+        // Get the camera base URL - this should be your computer's IP or a public URL
+        const cameraBaseUrl = process.env.NEXT_PUBLIC_CAMERA_BASE_URL || window.location.origin;
+        
         // Create URL for camera page with server parameter
         const sessionId = `session_${Date.now()}`;
-        const cameraUrl = `${window.location.origin}/camera?server=${encodeURIComponent(sam2ServerUrl)}&session=${sessionId}`;
+        const cameraUrl = `${cameraBaseUrl}/camera?server=${encodeURIComponent(sam2ServerUrl)}&session=${sessionId}`;
         
         // Generate QR code
         const qrDataUrl = await QRCode.toDataURL(cameraUrl, {
@@ -122,7 +125,7 @@ export default function QRCodeDisplay({ className = '', onSessionCreated }: QRCo
         {/* Debug info in development */}
         {process.env.NODE_ENV === 'development' && (
           <div className="mt-4 p-3 bg-gray-100 rounded text-xs text-gray-600 text-left">
-            <p className="font-mono break-all">Camera URL: {window.location.origin}/camera</p>
+            <p className="font-mono break-all">Camera URL: {process.env.NEXT_PUBLIC_CAMERA_BASE_URL || 'Not configured'}</p>
             <p className="font-mono break-all mt-1">Server: {serverUrl}</p>
             <p className="font-mono mt-1">Status: {error ? 'Error' : 'Ready'}</p>
           </div>
