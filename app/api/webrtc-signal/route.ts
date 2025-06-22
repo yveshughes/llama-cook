@@ -3,7 +3,7 @@ import { NextRequest } from 'next/server';
 // Note: This is a simplified WebSocket implementation for Next.js
 // For production, consider using a dedicated WebSocket server
 
-export async function GET(request: NextRequest) {
+export async function GET() {
   // WebSocket upgrade is not directly supported in Next.js App Router
   // Return information about how to set up WebRTC signaling
   

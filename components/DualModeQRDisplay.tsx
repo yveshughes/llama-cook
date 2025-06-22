@@ -24,6 +24,7 @@ export default function DualModeQRDisplay({ className = '', onSessionCreated }: 
     if (sessionId) {
       generateQRCode();
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [connectionMode, sessionId]);
 
   const generateQRCode = async () => {

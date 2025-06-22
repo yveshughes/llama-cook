@@ -46,6 +46,7 @@ function CameraPageContent() {
       clearTimeout(autoStartTimer);
       cleanup();
     };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [roomId]);
 
   const cleanup = () => {
@@ -73,7 +74,7 @@ function CameraPageContent() {
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
       }
-    } catch (err) {
+    } catch {
       console.log('Camera access denied');
       setError('Failed to access camera. Please ensure you have granted camera permissions.');
     }
@@ -153,7 +154,7 @@ function CameraPageContent() {
         }
       };
       
-    } catch (err) {
+    } catch {
       console.log('WebRTC not available, using WebSocket mode');
       setConnectionStatus('disconnected');
       // Automatically fallback to WebSocket streaming
@@ -242,7 +243,7 @@ function CameraPageContent() {
         if (successCount === 1) {
           setConnectionStatus('connected');
         }
-      } catch (err) {
+      } catch {
         failureCount++;
         console.log('Stream attempt failed, retry #' + failureCount);
         

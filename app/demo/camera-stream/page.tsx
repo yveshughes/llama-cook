@@ -55,7 +55,7 @@ export default function CameraStreamDemo() {
             <li>Choose your connection mode (Same Network for best performance)</li>
             <li>Scan the QR code with your iPhone</li>
             <li>Allow camera permissions when prompted</li>
-            <li>Tap "Start Streaming" on your phone</li>
+            <li>Tap &quot;Start Streaming&quot; on your phone</li>
             <li>The video feed will appear on this page</li>
           </ol>
           

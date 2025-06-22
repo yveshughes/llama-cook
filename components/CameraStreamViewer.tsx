@@ -26,6 +26,7 @@ export default function CameraStreamViewer({ roomId, mode, className = '' }: Cam
     return () => {
       cleanup();
     };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [roomId, mode]);
 
   const cleanup = () => {
