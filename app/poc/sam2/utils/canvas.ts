@@ -19,14 +19,20 @@ export function scaleCoordinates(
   canvasWidth: number,
   canvasHeight: number
 ): Detection['bbox'] {
+  // Prevent division by zero
+  if (videoWidth === 0 || videoHeight === 0 || canvasWidth === 0 || canvasHeight === 0) {
+    return [0, 0, 0, 0];
+  }
+  
   const scaleX = canvasWidth / videoWidth;
   const scaleY = canvasHeight / videoHeight;
   
+  // Ensure all values are finite
   return [
-    bbox[0] * scaleX,
-    bbox[1] * scaleY,
-    bbox[2] * scaleX,
-    bbox[3] * scaleY,
+    isFinite(bbox[0] * scaleX) ? bbox[0] * scaleX : 0,
+    isFinite(bbox[1] * scaleY) ? bbox[1] * scaleY : 0,
+    isFinite(bbox[2] * scaleX) ? bbox[2] * scaleX : 0,
+    isFinite(bbox[3] * scaleY) ? bbox[3] * scaleY : 0,
   ];
 }
 
@@ -41,6 +47,11 @@ export function drawBoundingBox(options: DrawOptions) {
     options.canvasWidth,
     options.canvasHeight
   );
+  
+  // Skip drawing if dimensions are invalid
+  if (width === 0 || height === 0 || !isFinite(x) || !isFinite(y) || !isFinite(width) || !isFinite(height)) {
+    return;
+  }
   
   ctx.save();
   
@@ -126,6 +137,12 @@ export function drawLabel(options: DrawOptions) {
   const labelX = x + (width - totalWidth) / 2;
   const labelY = y - labelHeight - 5;
   
+  // Ensure all values are finite before drawing
+  if (!isFinite(labelX) || !isFinite(labelY) || !isFinite(totalWidth) || !isFinite(labelHeight)) {
+    ctx.restore();
+    return;
+  }
+  
   // Draw label background with gradient
   const gradient = ctx.createLinearGradient(labelX, labelY, labelX, labelY + labelHeight);
   gradient.addColorStop(0, 'rgba(0, 0, 0, 0.8)');
@@ -133,7 +150,12 @@ export function drawLabel(options: DrawOptions) {
   
   ctx.fillStyle = gradient;
   ctx.beginPath();
-  ctx.roundRect(labelX, labelY, totalWidth, labelHeight, 4);
+  if (ctx.roundRect) {
+    ctx.roundRect(labelX, labelY, totalWidth, labelHeight, 4);
+  } else {
+    // Fallback for browsers that don't support roundRect
+    ctx.rect(labelX, labelY, totalWidth, labelHeight);
+  }
   ctx.fill();
   
   // Draw colored accent line
