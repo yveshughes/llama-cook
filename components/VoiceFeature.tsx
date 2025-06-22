@@ -256,9 +256,12 @@ export default function VoiceFeature() {
                 </div>
                 {!isLiveMode ? (
                   <div className="rounded-lg overflow-hidden">
-                    <img 
-                      src="/screens/sam2-sample.png" 
-                      alt="Kitchen ingredients sample"
+                    <video
+                      src="/videos/ingr.mp4"
+                      autoPlay
+                      loop
+                      muted
+                      playsInline
                       className="w-full h-auto object-cover"
                     />
                   </div>

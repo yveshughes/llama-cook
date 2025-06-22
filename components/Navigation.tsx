@@ -80,9 +80,14 @@ export default function Navigation() {
           >
             <button
               onClick={() => scrollToSection('hero')}
-              className="text-xl font-bold text-gray-900"
+              className="flex items-center gap-2"
             >
-              Llama-Cook
+              <img 
+                src="/logo.svg" 
+                alt="Llama-Cook Logo" 
+                className="h-8 w-auto"
+              />
+              <span className="text-xl font-bold text-gray-900">Llama-Cook</span>
             </button>
           </motion.div>
 
