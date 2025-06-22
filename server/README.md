@@ -15,6 +15,9 @@ python sam2_mock_server.py
 
 # In another terminal, expose with ngrok
 ngrok http 5000
+
+# The terminal will show your ngrok URL:
+# Forwarding  https://abc123xyz.ngrok-free.app -> http://localhost:5000
 ```
 
 ## Production Setup

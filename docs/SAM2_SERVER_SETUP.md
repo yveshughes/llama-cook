@@ -135,11 +135,19 @@ pip install flask flask-cors opencv-python pillow
 # macOS: brew install ngrok
 # Or download from https://ngrok.com/download
 
-# Authenticate ngrok
+# Authenticate ngrok (one-time setup)
 ngrok config add-authtoken YOUR_AUTH_TOKEN
 
 # Start ngrok tunnel (in a separate terminal)
+ngrok http 5000 --domain your-custom-domain.ngrok-free.app
+
+# Or use a random URL (free tier)
 ngrok http 5000
+```
+
+The ngrok URL will be displayed in the terminal, something like:
+```
+Forwarding  https://abc123xyz.ngrok-free.app -> http://localhost:5000
 ```
 
 ### 5. Run the SAM2 Server
