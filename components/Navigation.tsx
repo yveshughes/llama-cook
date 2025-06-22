@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
+import { useLiveMode } from '@/contexts/LiveModeContext';
 
 const navItems = [
   { id: 'hero', label: 'Home' },
@@ -16,6 +17,7 @@ const navItems = [
 export default function Navigation() {
   const [activeSection, setActiveSection] = useState('hero');
   const [isScrolled, setIsScrolled] = useState(false);
+  const { isLiveMode, setIsLiveMode } = useLiveMode();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -104,6 +106,37 @@ export default function Navigation() {
                 {item.label}
               </motion.button>
             ))}
+            
+            {/* Mode Toggle */}
+            <motion.div 
+              className="ml-4 flex items-center"
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: navItems.length * 0.1 }}
+            >
+              <div className="inline-flex items-center gap-2 bg-gray-100 rounded-full p-1">
+                <button
+                  onClick={() => setIsLiveMode(false)}
+                  className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all ${
+                    !isLiveMode 
+                      ? 'bg-white text-gray-900 shadow-sm' 
+                      : 'text-gray-600 hover:text-gray-900'
+                  }`}
+                >
+                  Demo
+                </button>
+                <button
+                  onClick={() => setIsLiveMode(true)}
+                  className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all ${
+                    isLiveMode 
+                      ? 'bg-white text-gray-900 shadow-sm' 
+                      : 'text-gray-600 hover:text-gray-900'
+                  }`}
+                >
+                  Live
+                </button>
+              </div>
+            </motion.div>
           </div>
 
           {/* Mobile Menu Button */}

@@ -7,14 +7,16 @@ import SAM2Feature from '@/components/SAM2Feature';
 import VJEPAFeature from '@/components/VJEPAFeature';
 import DemoSection from '@/components/DemoSection';
 import SetupInstructions from '@/components/SetupInstructions';
+import { LiveModeProvider } from '@/contexts/LiveModeContext';
 
 export default function Home() {
   return (
-    <div className="min-h-screen bg-gradient-to-b from-cream to-mozzarella">
-      <Navigation />
-      <div id="hero">
-        <HeroSection />
-      </div>
+    <LiveModeProvider>
+      <div className="min-h-screen bg-gradient-to-b from-cream to-mozzarella">
+        <Navigation />
+        <div id="hero">
+          <HeroSection />
+        </div>
       
       {/* Tech Stack Banner */}
       <TechStackBanner />
@@ -48,5 +50,6 @@ export default function Home() {
         <SetupInstructions />
       </div>
     </div>
+    </LiveModeProvider>
   );
 }

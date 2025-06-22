@@ -3,44 +3,11 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
+import TypewriterText from './TypewriterText';
+import { useLiveMode } from '@/contexts/LiveModeContext';
 
 export default function VoiceFeature() {
-  const [isLiveMode, setIsLiveMode] = useState(false);
-  const [triggerTransition, setTriggerTransition] = useState(false);
-  const [scrollProgress, setScrollProgress] = useState(0);
-
-  useEffect(() => {
-    if (isLiveMode) return; // Only work in demo mode
-
-    const handleScroll = () => {
-      const voiceSection = document.getElementById('voice');
-      const llamaSection = document.getElementById('llama');
-      
-      if (!voiceSection || !llamaSection) return;
-      
-      const voiceRect = voiceSection.getBoundingClientRect();
-      
-      // Calculate when voice section is scrolling out and llama section is coming in
-      const voiceBottom = voiceRect.bottom;
-      const windowHeight = window.innerHeight;
-      
-      // Start transition when voice section is halfway out of view
-      if (voiceBottom < windowHeight * 0.5 && !triggerTransition) {
-        setTriggerTransition(true);
-        // Trigger the Llama section animation
-        setTimeout(() => {
-          window.dispatchEvent(new Event('triggerLlamaTransition'));
-        }, 300);
-      }
-      
-      // Calculate scroll progress for smooth animation
-      const progress = Math.max(0, Math.min(1, (windowHeight - voiceBottom) / windowHeight));
-      setScrollProgress(progress);
-    };
-
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, [isLiveMode, triggerTransition]);
+  const { isLiveMode } = useLiveMode();
 
   return (
     <section className="py-24 sm:py-32 bg-gradient-to-br from-cream to-white">
@@ -74,60 +41,12 @@ export default function VoiceFeature() {
             className="relative"
           >
             <div className="space-y-4">
-              {/* Mode Toggle */}
-              <motion.div 
-                className="flex justify-center"
-                initial={{ opacity: 0, y: -10 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.1 }}
-                viewport={{ once: true }}
-              >
-                <div className="inline-flex items-center gap-3 bg-gray-100 rounded-full p-1">
-                  <button
-                    onClick={() => setIsLiveMode(false)}
-                    className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
-                      !isLiveMode 
-                        ? 'bg-white text-gray-900 shadow-sm' 
-                        : 'text-gray-600 hover:text-gray-900'
-                    }`}
-                  >
-                    Demo Mode
-                  </button>
-                  <button
-                    onClick={() => setIsLiveMode(true)}
-                    className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
-                      isLiveMode 
-                        ? 'bg-white text-gray-900 shadow-sm' 
-                        : 'text-gray-600 hover:text-gray-900'
-                    }`}
-                  >
-                    Live Mode
-                  </button>
-                </div>
-              </motion.div>
-
               {/* AWS Transcription Block */}
               <motion.div 
                 className="bg-black rounded-xl shadow-lg p-6 border border-gray-800"
                 initial={{ opacity: 0, y: -20 }}
-                animate={{ 
-                  opacity: !isLiveMode && scrollProgress > 0.8 ? 0 : 1,
-                  y: !isLiveMode ? scrollProgress * 300 : 0,
-                  scale: !isLiveMode ? 1 + (scrollProgress * 0.1) : 1,
-                  zIndex: !isLiveMode && scrollProgress > 0 ? 50 : 'auto'
-                }}
-                style={{
-                  position: !isLiveMode && scrollProgress > 0.1 ? 'fixed' : 'relative',
-                  top: !isLiveMode && scrollProgress > 0.1 ? '20vh' : 'auto',
-                  left: !isLiveMode && scrollProgress > 0.1 ? '50%' : 'auto',
-                  transform: !isLiveMode && scrollProgress > 0.1 ? 'translateX(-50%)' : 'none',
-                  maxWidth: !isLiveMode && scrollProgress > 0.1 ? '600px' : '100%',
-                  width: !isLiveMode && scrollProgress > 0.1 ? '90%' : '100%',
-                }}
-                transition={{ 
-                  duration: 0.1,
-                  ease: "linear"
-                }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.2 }}
                 viewport={{ once: true }}
               >
                 <div className="flex items-center justify-between mb-4">
@@ -143,25 +62,22 @@ export default function VoiceFeature() {
                     </span>
                   </div>
                 </div>
-                <div className="bg-gray-900 rounded-lg p-4 font-mono min-h-[60px] flex items-center">
+                <div className="bg-gray-900 rounded-lg p-4 font-mono min-h-[60px]">
                   {!isLiveMode ? (
-                    <motion.div
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: [0.7, 1, 0.7] }}
-                      transition={{
-                        duration: 2,
-                        repeat: Infinity,
-                        repeatType: "reverse",
-                      }}
-                      className="w-full"
-                    >
-                      <p className="text-sm">
-                        <span className="text-orange-400">&quot;</span>
-                        <span className="text-herb-green font-bold">Sous Chef</span>
-                        <span className="text-white">, what can I do with these ingredients?</span>
-                        <span className="text-orange-400">&quot;</span>
-                      </p>
-                    </motion.div>
+                    <div className="w-full">
+                      <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ duration: 0.5 }}
+                      >
+                        <p className="text-sm">
+                          <span className="text-orange-400">&quot;</span>
+                          <span className="text-herb-green font-bold">Sous Chef</span>
+                          <span className="text-white">, what can I do with these ingredients?</span>
+                          <span className="text-orange-400">&quot;</span>
+                        </p>
+                      </motion.div>
+                    </div>
                   ) : (
                     <div className="w-full">
                       <p className="text-sm text-gray-500">
@@ -179,9 +95,6 @@ export default function VoiceFeature() {
                   </div>
                   {isLiveMode && (
                     <span className="text-gray-500">Say &quot;Sous Chef&quot; to activate</span>
-                  )}
-                  {!isLiveMode && scrollProgress < 0.1 && (
-                    <span className="text-gray-400 text-xs">Scroll down to process</span>
                   )}
                 </div>
               </motion.div>
