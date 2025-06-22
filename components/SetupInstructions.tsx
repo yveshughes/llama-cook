@@ -51,21 +51,28 @@ npm run dev
     id: 'terminal3',
     title: 'Terminal 3: SAM2 Service',
     content: `# In another terminal
-cd llama-cook/services/sam2
+cd llama-cook/server
 
-# Activate Python virtual environment
-python -m venv venv
-source venv/bin/activate  # On Windows: venv\\Scripts\\activate
+# Install dependencies
+pip install flask flask-cors opencv-python pillow
 
-# Install SAM2
-pip install segment-anything-2
+# Start SAM2 service (use mock for testing)
+python sam2_mock_server.py
+# Service will run on http://localhost:5000`
+  },
+  {
+    id: 'terminal4',
+    title: 'Terminal 4: ngrok Tunnel',
+    content: `# In another terminal, expose SAM2 with ngrok
+ngrok http 5000
 
-# Download model weights
-python download_models.py
+# You'll see output like:
+# Forwarding  https://abc123xyz.ngrok-free.app -> http://localhost:5000
 
-# Start SAM2 service
-python sam2_service.py
-# Service will run on http://localhost:8001`
+# Copy the https URL and add to .env.local:
+# NEXT_PUBLIC_SAM2_SERVER_URL=https://abc123xyz.ngrok-free.app
+
+# Restart the Next.js server (Terminal 2) after updating .env.local`
   },
   {
     id: 'iphone',
@@ -82,15 +89,21 @@ Note: iPhone and MacBook must be on same WiFi network`
     id: 'testing',
     title: 'Testing the Demo',
     content: `1. Open http://localhost:3000 on MacBook
-2. Click "Demo It" or scan QR code
-3. Say "Sous Chef" to activate
-4. Show ingredients to camera
-5. Follow the AI guidance
+2. Navigate to SAM2 POC: http://localhost:3000/poc/sam2
+3. Click "Live" mode to see QR code
+4. Scan QR code with iPhone camera
+5. Allow camera permissions and start streaming
+
+For voice demo:
+1. Click "Demo It" on homepage
+2. Say "Sous Chef" to activate
+3. Show ingredients to camera
+4. Follow the AI guidance
 
 Troubleshooting:
 • Check all services are running
-• Verify network connectivity
-• Ensure GPU is detected for SAM2
+• Verify ngrok URL in .env.local
+• Ensure iPhone and MacBook on same WiFi
 • Check browser console for errors`
   }
 ];

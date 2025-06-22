@@ -5,6 +5,8 @@ export interface VideoConfig {
   src: string;
   poster?: string;
   duration: number;
+  width?: number;
+  height?: number;
 }
 
 export const videos: VideoConfig[] = [
@@ -12,9 +14,11 @@ export const videos: VideoConfig[] = [
     id: 'caprese-salad',
     title: 'Classic Caprese Salad',
     description: 'Watch as fresh tomatoes, mozzarella, and basil come together in this timeless Italian dish',
-    src: '/videos/caprese-salad.mp4',
-    poster: '/videos/caprese-salad-poster.jpg',
+    src: '/caprese-placeholder.mp4',
+    poster: '/caprese-placeholder-poster.jpg',
     duration: 12000, // 12 seconds
+    width: 816,  // Actual video dimensions from the screenshot
+    height: 459,
   },
 ];
 
