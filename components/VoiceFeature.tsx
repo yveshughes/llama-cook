@@ -1,12 +1,34 @@
 'use client';
 
+import { useState } from 'react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 
 export default function VoiceFeature() {
+  const [isLiveMode, setIsLiveMode] = useState(false);
+
   return (
-    <section className="py-24 sm:py-32 bg-white">
+    <section className="py-24 sm:py-32 bg-gradient-to-br from-cream to-white">
       <div className="mx-auto max-w-7xl px-6 lg:px-8">
+        <div className="text-center mb-16">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+            viewport={{ once: true }}
+          >
+            <span className="inline-flex items-center rounded-full bg-herb-green/10 px-4 py-2 text-sm font-medium text-herb-green mb-4">
+              Step 1: Voice Command
+            </span>
+            <h2 className="text-4xl font-bold tracking-tight text-gray-900 sm:text-5xl">
+              &quot;What can I do with these ingredients?&quot;
+            </h2>
+            <p className="mt-4 text-xl text-gray-600">
+              Start your cooking journey with a simple voice command
+            </p>
+          </motion.div>
+        </div>
+
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
           {/* Left side - Video */}
           <motion.div
@@ -14,30 +36,195 @@ export default function VoiceFeature() {
             whileInView={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.8 }}
             viewport={{ once: true }}
-            className="relative lg:order-1"
+            className="relative"
           >
-            <div className="aspect-video bg-gradient-to-br from-herb-red/30 to-tomato/30 rounded-xl overflow-hidden shadow-2xl">
-              <div className="absolute inset-0 flex items-center justify-center">
-                <div className="text-gray-700 text-center">
-                  <svg className="w-16 h-16 mx-auto mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
-                  </svg>
-                  <p className="text-lg font-medium">Voice Interaction Demo</p>
-                  <p className="text-sm text-gray-600 mt-2">Hands-free cooking guidance</p>
+            <div className="space-y-4">
+              {/* Mode Toggle */}
+              <motion.div 
+                className="flex justify-center"
+                initial={{ opacity: 0, y: -10 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.1 }}
+                viewport={{ once: true }}
+              >
+                <div className="inline-flex items-center gap-3 bg-gray-100 rounded-full p-1">
+                  <button
+                    onClick={() => setIsLiveMode(false)}
+                    className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
+                      !isLiveMode 
+                        ? 'bg-white text-gray-900 shadow-sm' 
+                        : 'text-gray-600 hover:text-gray-900'
+                    }`}
+                  >
+                    Demo Mode
+                  </button>
+                  <button
+                    onClick={() => setIsLiveMode(true)}
+                    className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
+                      isLiveMode 
+                        ? 'bg-white text-gray-900 shadow-sm' 
+                        : 'text-gray-600 hover:text-gray-900'
+                    }`}
+                  >
+                    Live Mode
+                  </button>
                 </div>
-              </div>
+              </motion.div>
+
+              {/* AWS Transcription Block */}
+              <motion.div 
+                className="bg-black rounded-xl shadow-lg p-6 border border-gray-800"
+                initial={{ opacity: 0, y: -20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.2 }}
+                viewport={{ once: true }}
+              >
+                <div className="flex items-center justify-between mb-4">
+                  <h4 className="font-semibold text-white">AWS Transcription</h4>
+                  <div className="flex items-center">
+                    <div className={`w-2 h-2 rounded-full animate-pulse mr-2 ${
+                      isLiveMode ? 'bg-red-500' : 'bg-herb-green'
+                    }`}></div>
+                    <span className={`text-xs ${
+                      isLiveMode ? 'text-red-500' : 'text-herb-green'
+                    }`}>
+                      {isLiveMode ? 'Live' : 'Listening'}
+                    </span>
+                  </div>
+                </div>
+                <div className="bg-gray-900 rounded-lg p-4 font-mono min-h-[60px] flex items-center">
+                  {!isLiveMode ? (
+                    <motion.div
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: [0.7, 1, 0.7] }}
+                      transition={{
+                        duration: 2,
+                        repeat: Infinity,
+                        repeatType: "reverse",
+                      }}
+                      className="w-full"
+                    >
+                      <p className="text-sm">
+                        <span className="text-orange-400">&quot;</span>
+                        <span className="text-herb-green font-bold">Sous Chef</span>
+                        <span className="text-white">, what can I do with these ingredients?</span>
+                        <span className="text-orange-400">&quot;</span>
+                      </p>
+                    </motion.div>
+                  ) : (
+                    <div className="w-full">
+                      <p className="text-sm text-gray-500">
+                        <span className="inline-block animate-pulse">Listening for &quot;Sous Chef&quot;...</span>
+                      </p>
+                    </div>
+                  )}
+                </div>
+                <div className="mt-3 flex items-center justify-between text-xs">
+                  <div className="flex items-center text-gray-400">
+                    <svg className="w-4 h-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
+                    </svg>
+                    {!isLiveMode ? 'Wake word detected' : 'Real-time transcription'}
+                  </div>
+                  {isLiveMode && (
+                    <span className="text-gray-500">Say &quot;Sous Chef&quot; to activate</span>
+                  )}
+                </div>
+              </motion.div>
+              
+              {/* Video Stream Block */}
+              <motion.div 
+                className="bg-white rounded-xl shadow-lg p-6 border border-golden/20"
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.4 }}
+                viewport={{ once: true }}
+              >
+                <div className="flex items-center justify-between mb-4">
+                  <h4 className="font-semibold text-gray-900">
+                    {isLiveMode ? 'Camera Input' : 'iPhone Camera Stream'}
+                  </h4>
+                  <div className="flex items-center">
+                    <div className={`w-2 h-2 rounded-full animate-pulse mr-2 ${
+                      isLiveMode ? 'bg-gray-400' : 'bg-golden'
+                    }`}></div>
+                    <span className={`text-xs ${
+                      isLiveMode ? 'text-gray-500' : 'text-golden'
+                    }`}>
+                      {isLiveMode ? 'Ready' : 'Streaming'}
+                    </span>
+                  </div>
+                </div>
+                {!isLiveMode ? (
+                  <div className="rounded-lg overflow-hidden">
+                    <img 
+                      src="/screens/sam2-sample.png" 
+                      alt="Kitchen ingredients sample"
+                      className="w-full h-auto object-cover"
+                    />
+                  </div>
+                ) : (
+                  <div className="bg-gray-50 rounded-lg aspect-video flex items-center justify-center border-2 border-dashed border-gray-300">
+                    <div className="text-center">
+                      <div className="flex justify-center gap-8 mb-4">
+                        {/* Upload Image */}
+                        <label className="cursor-pointer group">
+                          <input type="file" className="hidden" accept="image/*" />
+                          <div className="flex flex-col items-center">
+                            <div className="w-16 h-16 bg-gray-100 rounded-lg flex items-center justify-center group-hover:bg-gray-200 transition-colors">
+                              <svg className="w-8 h-8 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                              </svg>
+                            </div>
+                            <span className="text-sm text-gray-700 mt-2">Upload Image</span>
+                          </div>
+                        </label>
+                        
+                        {/* QR Code */}
+                        <button className="group">
+                          <div className="flex flex-col items-center">
+                            <div className="w-16 h-16 bg-gray-100 rounded-lg flex items-center justify-center group-hover:bg-gray-200 transition-colors">
+                              <svg className="w-8 h-8 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h2M4 12h8m-4 0v.01M12 12v8m-8-4h2m0 0v4m0-11v3" />
+                              </svg>
+                            </div>
+                            <span className="text-sm text-gray-700 mt-2">Scan QR Code</span>
+                          </div>
+                        </button>
+                      </div>
+                      <p className="text-xs text-gray-500">
+                        Connect your iPhone camera or upload an image
+                      </p>
+                    </div>
+                  </div>
+                )}
+              </motion.div>
             </div>
             
-            {/* Natural element */}
+            {/* Visual elements */}
             <motion.div
-              className="absolute -bottom-4 -left-4 w-16 h-16 bg-olive/30 rounded-full"
+              className="absolute -top-4 -right-4 w-20 h-20 bg-golden/30 rounded-full blur-xl"
               animate={{
-                scale: [1, 1.2, 1],
+                scale: [1, 1.3, 1],
+                opacity: [0.5, 0.8, 0.5],
               }}
               transition={{
                 duration: 3,
                 repeat: Infinity,
                 repeatType: "reverse",
+              }}
+            />
+            <motion.div
+              className="absolute -bottom-4 -left-4 w-16 h-16 bg-herb-green/30 rounded-full blur-xl"
+              animate={{
+                scale: [1, 1.2, 1],
+                opacity: [0.5, 0.8, 0.5],
+              }}
+              transition={{
+                duration: 3,
+                repeat: Infinity,
+                repeatType: "reverse",
+                delay: 1.5,
               }}
             />
           </motion.div>
@@ -48,129 +235,92 @@ export default function VoiceFeature() {
             whileInView={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.8 }}
             viewport={{ once: true }}
-            className="lg:order-2"
           >
-            <div className="mb-6">
-              <span className="inline-flex items-center rounded-full bg-tomato/10 px-3 py-1 text-sm font-medium text-tomato mb-4">
-                Powered by AWS AI Services
-              </span>
-              <h2 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
-                Hands-Free Kitchen Assistant
-              </h2>
+            <div className="mb-8">
+              <h3 className="text-2xl font-bold text-gray-900 mb-4">
+                Your Hands-Free Kitchen Journey Begins Here
+              </h3>
+              <p className="text-lg text-gray-600">
+                With just your voice, unlock personalized recipes based on what&apos;s in your kitchen. 
+                No typing, no scrolling – just natural conversation with your AI sous chef.
+              </p>
             </div>
             
-            <p className="text-lg text-gray-600 mb-8">
-              Keep your hands free for cooking with AWS-powered voice recognition and synthesis, while SAM2 tracks ingredients and Llama-4-Scout delivers instant guidance.
-            </p>
-            
-            <div className="space-y-4">
+            <div className="space-y-6">
               <motion.div 
-                className="flex items-start"
+                className="bg-white rounded-lg p-6 shadow-sm border border-gray-100"
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.2 }}
                 viewport={{ once: true }}
               >
-                <div className="flex-shrink-0 h-10 w-10 rounded-lg bg-herb-green/10 flex items-center justify-center">
-                  <svg className="w-6 h-6 text-herb-green" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
-                  </svg>
-                </div>
-                <div className="ml-4">
-                  <h3 className="text-lg font-semibold text-gray-900">Voice Activation</h3>
-                  <p className="mt-1 text-gray-600">Simply say &quot;Sous Chef&quot; to get started</p>
-                </div>
+                <h4 className="font-semibold text-gray-900 mb-3 flex items-center">
+                  <span className="w-8 h-8 bg-herb-green/10 rounded-full flex items-center justify-center mr-3 text-sm font-bold text-herb-green">1</span>
+                  Wake Word Detection
+                </h4>
+                <p className="text-gray-600 ml-11">
+                  Simply say &quot;Sous Chef&quot; to activate your assistant. Powered by AWS Transcribe&apos;s 
+                  real-time streaming, it&apos;s always ready when you are.
+                </p>
               </motion.div>
               
               <motion.div 
-                className="flex items-start"
+                className="bg-white rounded-lg p-6 shadow-sm border border-gray-100"
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.3 }}
                 viewport={{ once: true }}
               >
-                <div className="flex-shrink-0 h-10 w-10 rounded-lg bg-golden/10 flex items-center justify-center">
-                  <svg className="w-6 h-6 text-golden" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
-                  </svg>
-                </div>
-                <div className="ml-4">
-                  <h3 className="text-lg font-semibold text-gray-900">Natural Conversation</h3>
-                  <p className="mt-1 text-gray-600">Ask questions and receive clear, spoken instructions</p>
-                </div>
+                <h4 className="font-semibold text-gray-900 mb-3 flex items-center">
+                  <span className="w-8 h-8 bg-golden/10 rounded-full flex items-center justify-center mr-3 text-sm font-bold text-golden">2</span>
+                  Natural Language Understanding
+                </h4>
+                <p className="text-gray-600 ml-11">
+                  Ask naturally: &quot;What can I make with tomatoes and mozzarella?&quot; 
+                  The system understands context and cooking intent.
+                </p>
               </motion.div>
               
               <motion.div 
-                className="flex items-start"
+                className="bg-white rounded-lg p-6 shadow-sm border border-gray-100"
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.4 }}
                 viewport={{ once: true }}
               >
-                <div className="flex-shrink-0 h-10 w-10 rounded-lg bg-herb-red/10 flex items-center justify-center">
-                  <svg className="w-6 h-6 text-herb-red" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                  </svg>
-                </div>
-                <div className="ml-4">
-                  <h3 className="text-lg font-semibold text-gray-900">Lightning Fast</h3>
-                  <p className="mt-1 text-gray-600">Sub-100ms response time for seamless conversation</p>
-                </div>
+                <h4 className="font-semibold text-gray-900 mb-3 flex items-center">
+                  <span className="w-8 h-8 bg-tomato/10 rounded-full flex items-center justify-center mr-3 text-sm font-bold text-tomato">3</span>
+                  Instant Voice Response
+                </h4>
+                <p className="text-gray-600 ml-11">
+                  Get immediate, conversational responses through Amazon Polly&apos;s neural voices. 
+                  Sub-100ms latency keeps the conversation flowing naturally.
+                </p>
               </motion.div>
             </div>
             
             <motion.div 
-              className="mt-8 space-y-4"
+              className="mt-8 p-6 bg-herb-green/5 rounded-lg border border-herb-green/20"
               initial={{ opacity: 0 }}
               whileInView={{ opacity: 1 }}
               transition={{ delay: 0.6 }}
               viewport={{ once: true }}
             >
-              <div className="p-4 bg-mozzarella rounded-lg border border-cream">
-                <h4 className="font-semibold text-gray-900 mb-3">AWS Services Integration:</h4>
-                <div className="space-y-3">
-                  <div className="flex items-start">
-                    <div className="flex-shrink-0 w-8 h-8 bg-orange-100 rounded-lg flex items-center justify-center mt-0.5">
-                      <svg className="w-5 h-5 text-orange-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
-                      </svg>
-                    </div>
-                    <div className="ml-3">
-                      <h5 className="text-sm font-semibold text-gray-900">Amazon Transcribe Streaming</h5>
-                      <p className="text-xs text-gray-600 mt-0.5">Real-time speech-to-text with wake word detection for &quot;Sous Chef&quot;</p>
-                    </div>
-                  </div>
-                  <div className="flex items-start">
-                    <div className="flex-shrink-0 w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center mt-0.5">
-                      <svg className="w-5 h-5 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3" />
-                      </svg>
-                    </div>
-                    <div className="ml-3">
-                      <h5 className="text-sm font-semibold text-gray-900">Amazon Polly Neural TTS</h5>
-                      <p className="text-xs text-gray-600 mt-0.5">Natural-sounding voice responses with emotion and emphasis</p>
-                    </div>
-                  </div>
-                  <div className="flex items-start">
-                    <div className="flex-shrink-0 w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center mt-0.5">
-                      <svg className="w-5 h-5 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                      </svg>
-                    </div>
-                    <div className="ml-3">
-                      <h5 className="text-sm font-semibold text-gray-900">WebSocket Streaming</h5>
-                      <p className="text-xs text-gray-600 mt-0.5">Low-latency bidirectional audio for sub-100ms response</p>
-                    </div>
-                  </div>
+              <div className="flex items-start">
+                <div className="flex-shrink-0">
+                  <svg className="w-6 h-6 text-herb-green mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                  </svg>
                 </div>
-              </div>
-              <div className="p-4 bg-olive/10 rounded-lg">
-                <p className="text-sm text-gray-700">
-                  <span className="font-semibold">Example:</span> &quot;Sous Chef, I have tomatoes and mozzarella, what can we make?&quot;
-                </p>
-                <p className="text-sm text-gray-600 mt-1 italic">
-                  &quot;We could make a delicious Caprese Salad. Would you like me to guide you through it?&quot;
-                </p>
+                <div className="ml-3">
+                  <p className="text-sm font-semibold text-gray-900">Try it yourself:</p>
+                  <p className="text-sm text-gray-700 mt-1">
+                    &quot;Sous Chef, I have fresh tomatoes, mozzarella, and basil. What can we make?&quot;
+                  </p>
+                  <p className="text-sm text-herb-green mt-2 italic">
+                    → &quot;Perfect! With those ingredients, we can make a classic Caprese Salad. Would you like me to guide you through it?&quot;
+                  </p>
+                </div>
               </div>
             </motion.div>
             
@@ -179,15 +329,24 @@ export default function VoiceFeature() {
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.8 }}
               viewport={{ once: true }}
-              className="mt-6"
+              className="mt-8 flex items-center gap-4"
             >
               <Link
                 href="/poc/voice"
                 className="inline-flex items-center px-6 py-3 bg-herb-green text-white rounded-lg hover:bg-herb-green/90 transition-colors font-medium"
               >
-                See POC in Action
+                Try Voice Demo
                 <svg className="w-5 h-5 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
+              </Link>
+              <Link
+                href="#llama"
+                className="inline-flex items-center px-6 py-3 bg-white text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-medium border border-gray-200"
+              >
+                Next: AI Analysis
+                <svg className="w-5 h-5 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 13l-7 7-7-7m14-8l-7 7-7-7" />
                 </svg>
               </Link>
             </motion.div>

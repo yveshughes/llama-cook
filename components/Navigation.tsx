@@ -5,10 +5,10 @@ import { motion } from 'framer-motion';
 
 const navItems = [
   { id: 'hero', label: 'Home' },
+  { id: 'voice', label: 'Voice' },
+  { id: 'llama', label: 'Recipe AI' },
   { id: 'sam2', label: 'Vision AI' },
   { id: 'vjepa', label: 'Prediction AI' },
-  { id: 'llama', label: 'Recipe AI' },
-  { id: 'voice', label: 'Voice' },
   { id: 'demo', label: 'Demo' },
   { id: 'setup', label: 'Setup' },
 ];
