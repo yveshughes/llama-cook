@@ -2,27 +2,89 @@
 
 import { motion } from 'framer-motion';
 import Link from 'next/link';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import POCNavigation from '@/components/POCNavigation';
+import { TranscribeClient, TranscriptSegment } from '@/services/aws-transcribe-client';
 
 export default function VoicePOC() {
   const [mode, setMode] = useState<'demo' | 'live'>('demo');
   const [isListening, setIsListening] = useState(false);
-  const [transcript, setTranscript] = useState('');
-  const [response, setResponse] = useState('');
+  const [transcripts, setTranscripts] = useState<TranscriptSegment[]>([]);
   const [voiceState, setVoiceState] = useState<'idle' | 'listening' | 'processing' | 'speaking'>('idle');
+  const [error, setError] = useState<string | null>(null);
+  const [demoTranscript, setDemoTranscript] = useState('');
+  const [demoResponse, setDemoResponse] = useState('');
 
-  const startListening = () => {
+  // Create transcribe client instance
+  const [transcribeClient] = useState(() => new TranscribeClient());
+
+  // Real AWS Transcribe implementation
+  const startRealListening = async () => {
+    try {
+      setError(null);
+      setIsListening(true);
+      setVoiceState('listening');
+      setTranscripts([]);
+      
+      console.log('Starting AWS Transcribe...');
+      
+      await transcribeClient.startTranscription(
+        // On transcript received
+        (segment) => {
+          console.log(`Transcript segment:`, segment);
+          setTranscripts(prev => [...prev, segment]);
+          
+          // If it's a command and final, show a response after a delay
+          if (segment.isCommand && segment.isFinal && segment.text.length > 0) {
+            setTimeout(() => {
+              const responseSegment: TranscriptSegment = {
+                text: `I heard your command: "${segment.text}". (Llama API integration coming soon!)`,
+                isCommand: false,
+                isFinal: true,
+                timestamp: new Date()
+              };
+              setTranscripts(prev => [...prev, responseSegment]);
+            }, 500);
+          }
+        },
+        // On error
+        (error) => {
+          console.error('Transcription error in UI:', error);
+          setError(error.message);
+          setIsListening(false);
+          setVoiceState('idle');
+        }
+      );
+    } catch (err) {
+      console.error('Error starting transcription:', err);
+      setError(err instanceof Error ? err.message : 'Failed to start transcription');
+      setIsListening(false);
+      setVoiceState('idle');
+    }
+  };
+
+  const stopRealListening = async () => {
+    try {
+      await transcribeClient.stopTranscription();
+      setIsListening(false);
+      setVoiceState('idle');
+    } catch (err) {
+      console.error('Error stopping transcription:', err);
+    }
+  };
+
+  // Demo mode implementation (existing)
+  const startDemoListening = () => {
     setIsListening(true);
     setVoiceState('listening');
     
     // Simulate voice detection
     setTimeout(() => {
-      setTranscript('Sous Chef, I have tomatoes and mozzarella, what can we make?');
+      setDemoTranscript('Sous Chef, I have tomatoes and mozzarella, what can we make?');
       setVoiceState('processing');
       
       setTimeout(() => {
-        setResponse('Based on the tomatoes and mozzarella I can see, we could make a delicious Caprese Salad. Would you like me to guide you through it?');
+        setDemoResponse('Based on the tomatoes and mozzarella I can see, we could make a delicious Caprese Salad. Would you like me to guide you through it?');
         setVoiceState('speaking');
         
         setTimeout(() => {
@@ -31,6 +93,47 @@ export default function VoicePOC() {
         }, 3000);
       }, 800);
     }, 2000);
+  };
+
+  const startListening = mode === 'live' ? startRealListening : startDemoListening;
+  const stopListening = mode === 'live' ? stopRealListening : () => setIsListening(false);
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      if (isListening && mode === 'live') {
+        transcribeClient.stopTranscription();
+      }
+    };
+  }, [isListening, mode, transcribeClient]);
+
+  // Format transcripts for display
+  const formatTranscriptText = (segments: TranscriptSegment[]) => {
+    return segments.map((segment, index) => {
+      const words = segment.text.split(' ');
+      return (
+        <span key={index}>
+          {words.map((word, wordIndex) => {
+            const isWakeWord = word.toLowerCase().includes('sous') || 
+                             (words[wordIndex + 1] && words[wordIndex + 1].toLowerCase().includes('chef'));
+            return (
+              <span
+                key={`${index}-${wordIndex}`}
+                className={
+                  isWakeWord 
+                    ? 'text-herb-green font-bold' 
+                    : segment.isCommand 
+                    ? 'text-orange-600' 
+                    : 'text-gray-800'
+                }
+              >
+                {word}{' '}
+              </span>
+            );
+          })}
+        </span>
+      );
+    });
   };
 
   return (
@@ -76,7 +179,11 @@ export default function VoicePOC() {
             {/* Mode Toggle */}
             <div className="inline-flex items-center bg-gray-100 rounded-lg p-1">
               <button
-                onClick={() => setMode('demo')}
+                onClick={() => {
+                  if (isListening) stopListening();
+                  setMode('demo');
+                  setTranscripts([]);
+                }}
                 className={`px-3 py-1.5 text-sm rounded-md transition-all ${
                   mode === 'demo' 
                     ? 'bg-white text-gray-900 shadow-sm' 
@@ -86,7 +193,11 @@ export default function VoicePOC() {
                 Demo
               </button>
               <button
-                onClick={() => setMode('live')}
+                onClick={() => {
+                  if (isListening) stopListening();
+                  setMode('live');
+                  setTranscripts([]);
+                }}
                 className={`px-3 py-1.5 text-sm rounded-md transition-all ${
                   mode === 'live' 
                     ? 'bg-white text-gray-900 shadow-sm' 
@@ -104,48 +215,92 @@ export default function VoicePOC() {
       {mode === 'live' ? (
         <section className="py-6">
           <div className="mx-auto max-w-7xl px-6 lg:px-8">
-            <div className="max-w-2xl mx-auto">
+            <div className="max-w-4xl mx-auto">
               <div className="bg-gradient-to-r from-orange-500 to-orange-600 p-1 rounded-xl">
-                <div className="bg-white rounded-lg p-12 text-center">
-                  <button
-                    onClick={startListening}
-                    disabled={isListening}
-                    className={`relative w-40 h-40 rounded-full transition-all ${
-                      isListening 
-                        ? 'bg-orange-500 animate-pulse' 
-                        : 'bg-herb-green hover:bg-herb-green/90'
-                    }`}
-                  >
-                    <svg className="w-20 h-20 mx-auto text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
-                    </svg>
-                    {voiceState === 'listening' && (
-                      <motion.div
-                        className="absolute inset-0 rounded-full border-4 border-white"
-                        animate={{ scale: [1, 1.2, 1] }}
-                        transition={{ duration: 1.5, repeat: Infinity }}
-                      />
-                    )}
-                  </button>
-                  
-                  <h2 className="mt-6 text-2xl font-bold text-gray-900">Live Voice Control</h2>
-                  <p className="mt-2 text-gray-600">
-                    {voiceState === 'idle' && 'Click to start listening'}
-                    {voiceState === 'listening' && 'Listening for "Sous Chef"...'}
-                    {voiceState === 'processing' && 'Processing command...'}
-                    {voiceState === 'speaking' && 'Speaking response...'}
-                  </p>
-                  
-                  <div className="mt-8 flex items-center justify-center gap-4 text-sm">
-                    <div className="flex items-center text-green-600">
-                      <span className="w-2 h-2 bg-green-600 rounded-full mr-2 animate-pulse"></span>
-                      AWS Transcribe Active
+                <div className="bg-white rounded-lg p-8">
+                  <div className="flex items-start gap-8">
+                    {/* Left side - Control */}
+                    <div className="flex-shrink-0 text-center">
+                      <button
+                        onClick={() => isListening ? stopListening() : startListening()}
+                        className={`relative w-32 h-32 rounded-full transition-all ${
+                          isListening 
+                            ? 'bg-orange-500 animate-pulse' 
+                            : 'bg-herb-green hover:bg-herb-green/90'
+                        }`}
+                      >
+                        <svg className="w-16 h-16 mx-auto text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
+                        </svg>
+                        {voiceState === 'listening' && (
+                          <motion.div
+                            className="absolute inset-0 rounded-full border-4 border-white"
+                            animate={{ scale: [1, 1.2, 1] }}
+                            transition={{ duration: 1.5, repeat: Infinity }}
+                          />
+                        )}
+                      </button>
+                      
+                      <h2 className="mt-4 text-lg font-bold text-gray-900">Live Voice Control</h2>
+                      <p className="mt-2 text-sm text-gray-600">
+                        {!isListening && 'Click to start'}
+                        {isListening && 'Listening...'}
+                      </p>
+                      
+                      <div className="mt-4 flex items-center justify-center text-xs">
+                        <div className={`flex items-center ${isListening ? 'text-green-600' : 'text-gray-400'}`}>
+                          <span className={`w-2 h-2 rounded-full mr-1 ${
+                            isListening ? 'bg-green-600 animate-pulse' : 'bg-gray-400'
+                          }`}></span>
+                          AWS Transcribe {isListening ? 'Active' : 'Ready'}
+                        </div>
+                      </div>
                     </div>
-                    <div className="flex items-center text-blue-600">
-                      <span className="w-2 h-2 bg-blue-600 rounded-full mr-2"></span>
-                      AWS Polly Ready
+                    
+                    {/* Right side - Transcript */}
+                    <div className="flex-1">
+                      <div className="bg-gray-50 rounded-lg p-6 min-h-[300px] max-h-[400px] overflow-y-auto">
+                        <h3 className="font-semibold text-gray-900 mb-4">Transcript</h3>
+                        
+                        {transcripts.length === 0 ? (
+                          <p className="text-gray-500 text-sm">
+                            Start speaking to see your transcript here. Say &quot;Sous Chef&quot; followed by a command to highlight it.
+                          </p>
+                        ) : (
+                          <div className="space-y-2">
+                            <p className="text-sm leading-relaxed">
+                              {formatTranscriptText(transcripts)}
+                            </p>
+                          </div>
+                        )}
+                      </div>
+                      
+                      <div className="mt-4 text-xs text-gray-600">
+                        <p className="font-semibold mb-1">Color Guide:</p>
+                        <div className="flex gap-4">
+                          <span className="flex items-center">
+                            <span className="w-3 h-3 bg-herb-green rounded-full mr-1"></span>
+                            Wake Word
+                          </span>
+                          <span className="flex items-center">
+                            <span className="w-3 h-3 bg-orange-600 rounded-full mr-1"></span>
+                            Command
+                          </span>
+                          <span className="flex items-center">
+                            <span className="w-3 h-3 bg-gray-800 rounded-full mr-1"></span>
+                            Regular Speech
+                          </span>
+                        </div>
+                      </div>
                     </div>
                   </div>
+                  
+                  {/* Error Display */}
+                  {error && (
+                    <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-lg">
+                      <p className="text-sm text-red-600">{error}</p>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
@@ -190,10 +345,10 @@ export default function VoicePOC() {
                   </button>
                   
                   <p className="mt-4 text-gray-600">
-                    {voiceState === 'idle' && 'Click to start listening'}
-                    {voiceState === 'listening' && 'Listening... Say "Sous Chef" followed by your command'}
-                    {voiceState === 'processing' && 'Processing your request...'}
-                    {voiceState === 'speaking' && 'Speaking response...'}
+                    {voiceState === 'idle' && 'Click to start demo'}
+                    {voiceState === 'listening' && 'Demo: Listening for "Sous Chef"...'}
+                    {voiceState === 'processing' && 'Demo: Processing command...'}
+                    {voiceState === 'speaking' && 'Demo: Speaking response...'}
                   </p>
                 </div>
 
@@ -201,7 +356,7 @@ export default function VoicePOC() {
                 <div className="border-t border-gray-200 p-6">
                   <h4 className="font-semibold text-gray-900 mb-4">Conversation</h4>
                   
-                  {transcript && (
+                  {demoTranscript && (
                     <div className="mb-4">
                       <div className="flex items-start">
                         <div className="flex-shrink-0 w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center">
@@ -211,13 +366,13 @@ export default function VoicePOC() {
                         </div>
                         <div className="ml-3 flex-1">
                           <p className="text-sm font-medium text-gray-900">You</p>
-                          <p className="text-sm text-gray-600 mt-1">{transcript}</p>
+                          <p className="text-sm text-gray-600 mt-1">{demoTranscript}</p>
                         </div>
                       </div>
                     </div>
                   )}
                   
-                  {response && (
+                  {demoResponse && (
                     <div>
                       <div className="flex items-start">
                         <div className="flex-shrink-0 w-8 h-8 bg-herb-green rounded-full flex items-center justify-center">
@@ -227,7 +382,7 @@ export default function VoicePOC() {
                         </div>
                         <div className="ml-3 flex-1">
                           <p className="text-sm font-medium text-gray-900">Sous Chef</p>
-                          <p className="text-sm text-gray-600 mt-1">{response}</p>
+                          <p className="text-sm text-gray-600 mt-1">{demoResponse}</p>
                         </div>
                       </div>
                     </div>
@@ -270,9 +425,9 @@ export default function VoicePOC() {
                 <h2 className="text-2xl font-bold text-gray-900 mb-4">Voice Processing Pipeline</h2>
                 <div className="space-y-4">
                   <div className="p-4 bg-orange-50 rounded-lg border border-orange-200">
-                    <h3 className="font-semibold text-gray-900 mb-2">1. Wake Word Detection</h3>
+                    <h3 className="font-semibold text-gray-900 mb-2">1. Continuous Transcription</h3>
                     <p className="text-sm text-gray-600 mb-2">
-                      AWS Transcribe continuously monitors for &quot;Sous Chef&quot; wake word using streaming transcription.
+                      AWS Transcribe converts all speech to text in real-time, highlighting commands after &quot;Sous Chef&quot;.
                     </p>
                     <code className="text-xs bg-gray-100 px-2 py-1 rounded">
                       transcribeStreaming.startStreamTranscription()
@@ -280,128 +435,55 @@ export default function VoicePOC() {
                   </div>
                   
                   <div className="p-4 bg-blue-50 rounded-lg border border-blue-200">
-                    <h3 className="font-semibold text-gray-900 mb-2">2. Command Processing</h3>
+                    <h3 className="font-semibold text-gray-900 mb-2">2. Wake Word Detection</h3>
                     <p className="text-sm text-gray-600 mb-2">
-                      Once activated, captures the full command and sends to Llama-4-Scout with visual context.
+                      When &quot;Sous Chef&quot; is detected, subsequent text is highlighted as a command for 10 seconds.
                     </p>
                     <code className="text-xs bg-gray-100 px-2 py-1 rounded">
-                      {`await llamaAPI.chat({text: command, context: ingredients})`}
+                      {`if (text.includes('sous chef')) { activateCommand() }`}
                     </code>
                   </div>
                   
                   <div className="p-4 bg-purple-50 rounded-lg border border-purple-200">
-                    <h3 className="font-semibold text-gray-900 mb-2">3. Voice Response</h3>
+                    <h3 className="font-semibold text-gray-900 mb-2">3. Command Processing</h3>
                     <p className="text-sm text-gray-600 mb-2">
-                      BoundaryML formats responses for optimal TTS, then AWS Polly converts to natural speech.
+                      Highlighted commands are sent to Llama-4-Scout for recipe generation and guidance.
                     </p>
                     <code className="text-xs bg-gray-100 px-2 py-1 rounded">
-                      {`polly.synthesizeSpeech({Engine: 'neural'})`}
+                      {`await llamaAPI.chat({command, context})`}
                     </code>
                   </div>
-                </div>
-              </div>
-
-              {/* Performance Metrics */}
-              <div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-3">Performance Metrics</h3>
-                <div className="bg-gray-900 text-gray-100 p-4 rounded-lg overflow-x-auto">
-                  <pre className="text-sm">
-{`{
-  "pipeline_latency": {
-    "wake_word_detection": "150ms",
-    "transcription": "80ms",
-    "llama_processing": "87ms",
-    "boundaryml_structuring": "12ms",
-    "tts_generation": "120ms",
-    "total_end_to_end": "449ms"
-  },
-  "accuracy": {
-    "wake_word": "99.2%",
-    "transcription": "98.5%",
-    "command_understanding": "97.8%"
-  },
-  "voice_quality": {
-    "engine": "Neural",
-    "voice_id": "Joanna",
-    "sample_rate": "24000Hz"
-  }
-}`}
-                  </pre>
                 </div>
               </div>
 
               {/* Example Commands */}
               <div className="p-6 bg-olive/10 rounded-lg">
-                <h3 className="font-semibold text-gray-900 mb-3">Example Voice Commands</h3>
-                <ul className="text-sm text-gray-600 space-y-2">
-                  <li>• &quot;Sous Chef, what can I make with these ingredients?&quot;</li>
-                  <li>• &quot;Sous Chef, how do I prepare the tomatoes?&quot;</li>
-                  <li>• &quot;Sous Chef, set a timer for 5 minutes&quot;</li>
-                  <li>• &quot;Sous Chef, what&apos;s the next step?&quot;</li>
-                  <li>• &quot;Sous Chef, I need a vegetarian alternative&quot;</li>
-                </ul>
-                <Link 
-                  href="/demo"
-                  className="inline-flex items-center mt-4 text-sm font-medium text-herb-green hover:text-herb-green/80"
-                >
-                  Try Full Demo →
-                </Link>
+                <h3 className="font-semibold text-gray-900 mb-3">How It Works</h3>
+                <p className="text-sm text-gray-600 mb-3">
+                  Everything you say is transcribed. When you say &quot;Sous Chef&quot;, 
+                  the following words are highlighted as a command:
+                </p>
+                <div className="space-y-2 text-sm">
+                  <p>
+                    <span className="text-gray-600">Regular: &quot;Let me check what we have...&quot;</span>
+                  </p>
+                  <p>
+                    <span className="text-herb-green font-semibold">Sous Chef</span>
+                    <span className="text-orange-600">, what can I make with tomatoes?</span>
+                  </p>
+                  <p>
+                    <span className="text-gray-600">Regular: &quot;I also have some basil...&quot;</span>
+                  </p>
+                  <p>
+                    <span className="text-herb-green font-semibold">Sous Chef</span>
+                    <span className="text-orange-600">, add basil to the recipe</span>
+                  </p>
+                </div>
               </div>
             </motion.div>
           </div>
         </div>
       </section>
-      )}
-
-      {/* Integration Diagram */}
-      {mode === 'demo' && (
-        <section className="py-12 bg-gray-50">
-          <div className="mx-auto max-w-7xl px-6 lg:px-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-8 text-center">Complete Voice Flow</h2>
-            <div className="bg-white p-8 rounded-lg border border-gray-200">
-              <div className="grid grid-cols-1 md:grid-cols-5 gap-4 text-center">
-                <div className="space-y-2">
-                  <div className="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center mx-auto">
-                    <svg className="w-8 h-8 text-orange-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
-                    </svg>
-                  </div>
-                  <p className="text-sm font-medium">Voice Input</p>
-                </div>
-                
-                <div className="space-y-2">
-                  <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto">
-                    <span className="text-2xl">→</span>
-                  </div>
-                  <p className="text-sm font-medium">AWS Transcribe</p>
-                </div>
-                
-                <div className="space-y-2">
-                  <div className="w-16 h-16 bg-golden/20 rounded-full flex items-center justify-center mx-auto">
-                    <span className="text-2xl">🦙</span>
-                  </div>
-                  <p className="text-sm font-medium">Llama-4-Scout</p>
-                </div>
-                
-                <div className="space-y-2">
-                  <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto">
-                    <span className="text-2xl">→</span>
-                  </div>
-                  <p className="text-sm font-medium">AWS Polly</p>
-                </div>
-                
-                <div className="space-y-2">
-                  <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto">
-                    <svg className="w-8 h-8 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
-                    </svg>
-                  </div>
-                  <p className="text-sm font-medium">Voice Output</p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
       )}
 
       {/* POC Navigation */}

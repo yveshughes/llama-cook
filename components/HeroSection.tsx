@@ -5,15 +5,6 @@ import { motion } from 'framer-motion';
 export default function HeroSection() {
   return (
     <section className="relative overflow-hidden pt-32 pb-24 sm:pt-40 sm:pb-32">
-      {/* Background image */}
-      <div className="absolute inset-0 -z-10">
-        <img
-          src="/screens/background-sample.png"
-          alt=""
-          className="h-full w-full object-cover opacity-10"
-          loading="lazy"
-        />
-      </div>
       <div className="mx-auto max-w-7xl px-6 lg:px-8">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
           {/* Left side - Description */}
