@@ -5,6 +5,8 @@ import Link from 'next/link';
 import { useState, useEffect, useRef } from 'react';
 import { useLiveMode } from '@/contexts/LiveModeContext';
 import { TranscribeClient, TranscriptSegment } from '@/services/aws-transcribe-client';
+import DualModeQRDisplay from '@/components/DualModeQRDisplay';
+import CameraStreamViewer from '@/components/CameraStreamViewer';
 
 export default function VoiceFeature() {
   const { isLiveMode } = useLiveMode();
@@ -13,6 +15,7 @@ export default function VoiceFeature() {
   const [error, setError] = useState<string | null>(null);
   const [transcribeClient] = useState(() => new TranscribeClient());
   const transcriptContainerRef = useRef<HTMLDivElement>(null);
+  const [cameraView, setCameraView] = useState<'connect' | 'stream'>('connect');
 
   // Start transcription when in live mode
   useEffect(() => {
@@ -240,9 +243,35 @@ export default function VoiceFeature() {
                 viewport={{ once: true }}
               >
                 <div className="flex items-center justify-between mb-4">
-                  <h4 className="font-semibold text-gray-900">
-                    {isLiveMode ? 'Camera Input' : 'iPhone Camera Stream'}
-                  </h4>
+                  <div className="flex items-center gap-3">
+                    <h4 className="font-semibold text-gray-900">
+                      {isLiveMode ? 'Camera Input' : 'iPhone Camera Stream'}
+                    </h4>
+                    {isLiveMode && (
+                      <>
+                        <button 
+                          onClick={() => setCameraView('connect')}
+                          className={`text-xs underline transition-colors ${
+                            cameraView === 'connect' 
+                              ? 'text-herb-green font-semibold' 
+                              : 'text-gray-500 hover:text-herb-green'
+                          }`}
+                        >
+                          Connect Camera
+                        </button>
+                        <button 
+                          onClick={() => setCameraView('stream')}
+                          className={`text-xs underline transition-colors ${
+                            cameraView === 'stream' 
+                              ? 'text-herb-green font-semibold' 
+                              : 'text-gray-500 hover:text-herb-green'
+                          }`}
+                        >
+                          Live Stream
+                        </button>
+                      </>
+                    )}
+                  </div>
                   <div className="flex items-center">
                     <div className={`w-2 h-2 rounded-full animate-pulse mr-2 ${
                       isLiveMode ? 'bg-gray-400' : 'bg-golden'
@@ -266,39 +295,20 @@ export default function VoiceFeature() {
                     />
                   </div>
                 ) : (
-                  <div className="bg-gray-50 rounded-lg aspect-video flex items-center justify-center border-2 border-dashed border-gray-300">
-                    <div className="text-center">
-                      <div className="flex justify-center gap-8 mb-4">
-                        {/* Upload Image */}
-                        <label className="cursor-pointer group">
-                          <input type="file" className="hidden" accept="image/*" />
-                          <div className="flex flex-col items-center">
-                            <div className="w-16 h-16 bg-gray-100 rounded-lg flex items-center justify-center group-hover:bg-gray-200 transition-colors">
-                              <svg className="w-8 h-8 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
-                              </svg>
-                            </div>
-                            <span className="text-sm text-gray-700 mt-2">Upload Image</span>
-                          </div>
-                        </label>
-                        
-                        {/* QR Code */}
-                        <button className="group">
-                          <div className="flex flex-col items-center">
-                            <div className="w-16 h-16 bg-gray-100 rounded-lg flex items-center justify-center group-hover:bg-gray-200 transition-colors">
-                              <svg className="w-8 h-8 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h2M4 12h8m-4 0v.01M12 12v8m-8-4h2m0 0v4m0-11v3" />
-                              </svg>
-                            </div>
-                            <span className="text-sm text-gray-700 mt-2">Scan QR Code</span>
-                          </div>
-                        </button>
-                      </div>
-                      <p className="text-xs text-gray-500">
-                        Connect your iPhone camera or upload an image
-                      </p>
-                    </div>
-                  </div>
+                  cameraView === 'connect' ? (
+                    <DualModeQRDisplay 
+                      className="w-full"
+                      onSessionCreated={(sessionId, mode) => {
+                        console.log(`Camera session created: ${sessionId} (${mode} mode)`);
+                      }}
+                    />
+                  ) : (
+                    <CameraStreamViewer
+                      roomId="demo-room-001"
+                      mode="websocket"
+                      className="aspect-video rounded-lg bg-black"
+                    />
+                  )
                 )}
               </motion.div>
             </div>
