@@ -53,7 +53,7 @@ export default function QRCodeDisplay({ className = '', onSessionCreated }: QRCo
     };
 
     generateQRCode();
-  }, []);
+  }, [onSessionCreated]);
 
   // Check server health
   useEffect(() => {

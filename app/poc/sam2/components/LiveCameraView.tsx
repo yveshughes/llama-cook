@@ -10,10 +10,10 @@ interface LiveCameraViewProps {
 }
 
 export default function LiveCameraView({ sessionId, serverUrl }: LiveCameraViewProps) {
-  const [detections, setDetections] = useState<Detection[]>([]);
+  const [detections] = useState<Detection[]>([]);
   const [isConnected, setIsConnected] = useState(false);
-  const [lastFrame, setLastFrame] = useState<string>('');
-  const [frameSize, setFrameSize] = useState({ width: 640, height: 480 });
+  const [lastFrame] = useState<string>('');
+  const [frameSize] = useState({ width: 640, height: 480 });
   const intervalRef = useRef<NodeJS.Timeout>();
 
   useEffect(() => {

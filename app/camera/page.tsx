@@ -182,7 +182,7 @@ export default function CameraPage() {
           <ol className="list-decimal list-inside space-y-1 text-sm text-gray-300">
             <li>Allow camera permissions when prompted</li>
             <li>Position camera to show ingredients</li>
-            <li>Tap "Start Streaming" to begin</li>
+            <li>Tap &quot;Start Streaming&quot; to begin</li>
             <li>Video will be sent to SAM2 for analysis</li>
             <li>View results on desktop display</li>
           </ol>
